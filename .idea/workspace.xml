@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="69bc6445-0c41-4327-b29f-73a4ada99654" name="Changes" comment="Add XML configuration for Ask2Agent migration and update workspace settings" />
+    <list default="true" id="69bc6445-0c41-4327-b29f-73a4ada99654" name="Changes" comment="Lecture 2">
+      <change beforePath="$PROJECT_DIR$/.idea/CNS-study.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,6 +21,15 @@
     <persistenceIdMap>
       <entry key="_C:/Users/omarb/Desktop/CNS-study" value="3BdenUSsyiBbRbJvwUs1HwlJQ0X" />
     </persistenceIdMap>
+  </component>
+  <component name="CopilotUserSelectedChatMode">
+    <option name="chatModeId" value="Agent" />
+  </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="chat-panel" value="GPT-5.1-Codex-Max" />
+      <entry key="agent-panel" value="GPT-5.1-Codex-Max" />
+    </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
     <option name="cachedIndexableFilesCount" value="7" />
@@ -78,6 +94,11 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\omarb\Desktop\CNS-study" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -94,7 +115,8 @@
       <updated>1774823541711</updated>
       <workItem from="1774823543563" duration="1159000" />
       <workItem from="1774824742098" duration="1082000" />
-      <workItem from="1774878277583" duration="675000" />
+      <workItem from="1774878277583" duration="1942000" />
+      <workItem from="1774903920721" duration="4668000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial HTML structure and styles for Lecture 1 study guide">
       <option name="closed" value="true" />
@@ -112,7 +134,23 @@
       <option name="project" value="LOCAL" />
       <updated>1774878322911</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Add XML configuration for Ask2Agent migration and update workspace settings">
+      <option name="closed" value="true" />
+      <created>1774880315125</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1774880315125</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Lecture 2">
+      <option name="closed" value="true" />
+      <created>1774908315707</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1774908315707</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -121,7 +159,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add initial HTML structure and styles for Lecture 1 study guide" />
     <MESSAGE value="Add XML configuration for Ask2Agent migration and update workspace settings" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add XML configuration for Ask2Agent migration and update workspace settings" />
+    <MESSAGE value="Lecture 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lecture 2" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
