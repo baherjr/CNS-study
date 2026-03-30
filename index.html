@@ -25,6 +25,7 @@
         body[data-lec="2"]{--accent:#0d9488;--accent-l:rgba(13,148,136,.14);--accent-m:rgba(13,148,136,.3);--accent-dk:#2dd4bf}
         body[data-lec="3"]{--accent:#ea580c;--accent-l:rgba(234,88,12,.14);--accent-m:rgba(234,88,12,.3);--accent-dk:#fb923c}
         body[data-lec="4"]{--accent:#7c3aed;--accent-l:rgba(124,58,237,.14);--accent-m:rgba(124,58,237,.3);--accent-dk:#a78bfa}
+        body[data-lec="5"]{--accent:#0891b2;--accent-l:rgba(8,145,178,.14);--accent-m:rgba(8,145,178,.3);--accent-dk:#22d3ee}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth;height:100%}
         body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.65;height:100%;overflow:hidden;display:flex;flex-direction:column}
@@ -219,6 +220,7 @@
         <button class="lec-btn" onclick="showLec(2,this)">L2 — Number Theory</button>
         <button class="lec-btn" onclick="showLec(3,this)">L3 — Classical Ciphers</button>
         <button class="lec-btn" onclick="showLec(4,this)">L4 — Block Ciphers &amp; DES</button>
+        <button class="lec-btn" onclick="showLec(5,this)">L5 — Finite Fields</button>
     </div>
     <div id="header-right">
         <span class="hdr-tag">Stallings 8e · Ain Shams</span>
@@ -1068,6 +1070,292 @@
             </div>
         </div><!-- /lec4 -->
 
+        <!-- ════════════════════════════════════════
+             LECTURE 5 — Finite Fields
+        ════════════════════════════════════════ -->
+        <div class="lec-panel" id="lec5">
+
+            <!-- L5 SUMMARY -->
+            <div class="sec-panel" id="lec5-summary">
+                <div class="lec-hero">
+                    <div class="lec-hero-num">05</div>
+                    <div class="lec-hero-info">
+                        <h2>Finite Fields</h2>
+                        <p>Groups · Rings · Fields · GF(p) · GF(2ⁿ) · Polynomial Arithmetic · Two Uses of mod · Cyclic Groups</p>
+                    </div>
+                </div>
+
+                <p class="sec-title">5.1 — Groups</p>
+                <div class="card">
+                    <p style="font-size:13.5px">A <strong>group</strong> is a set G with a binary operation • satisfying the following axioms for all a, b, c ∈ G:</p>
+                    <table class="dt" style="margin-top:12px">
+                        <thead><tr><th>Axiom</th><th>Name</th><th>Statement</th></tr></thead>
+                        <tbody>
+                        <tr><td><span class="pill pill-cyan">A1</span></td><td><strong>Closure</strong></td><td>If a, b ∈ G then a • b ∈ G</td></tr>
+                        <tr><td><span class="pill pill-cyan">A2</span></td><td><strong>Associativity</strong></td><td>a • (b • c) = (a • b) • c</td></tr>
+                        <tr><td><span class="pill pill-cyan">A3</span></td><td><strong>Identity</strong></td><td>∃ e ∈ G such that a • e = e • a = a</td></tr>
+                        <tr><td><span class="pill pill-cyan">A4</span></td><td><strong>Inverse</strong></td><td>∀ a ∈ G, ∃ a⁻¹ ∈ G such that a • a⁻¹ = e</td></tr>
+                        <tr><td><span class="pill pill-gold">A5</span></td><td><strong>Commutative</strong></td><td>a • b = b • a &nbsp;(makes it an <em>Abelian group</em>)</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="callout callout-gold" style="margin-top:10px">A group with axioms A1–A4 only is a plain group. Adding A5 (commutativity) gives an <strong>Abelian group</strong>.</div>
+                </div>
+
+                <div class="card" style="margin-top:4px">
+                    <div class="card-title">Cyclic Groups</div>
+                    <p style="font-size:13.5px">A group G is <strong>cyclic</strong> if every element of G is a power aᵏ (k an integer) of a fixed element a ∈ G. That element a is called a <strong>generator</strong> of G.</p>
+                    <div class="formula formula-blue">a⁰ = e  (identity element)
+                        a⁻ⁿ = (a')ⁿ  where a' is the inverse of a
+                        A cyclic group is always ABELIAN and may be finite or infinite</div>
+                </div>
+
+                <p class="sec-title">5.2 — Rings</p>
+                <div class="card">
+                    <p style="font-size:13.5px">A <strong>ring</strong> {R, +, ×} is an Abelian group under addition (axioms A1–A5) plus additional axioms for multiplication:</p>
+                    <table class="dt" style="margin-top:10px">
+                        <thead><tr><th>Axiom</th><th>Name</th><th>Statement</th></tr></thead>
+                        <tbody>
+                        <tr><td><span class="pill pill-violet">M1</span></td><td>Closure (×)</td><td>If a, b ∈ R then ab ∈ R</td></tr>
+                        <tr><td><span class="pill pill-violet">M2</span></td><td>Associativity (×)</td><td>a(bc) = (ab)c</td></tr>
+                        <tr><td><span class="pill pill-violet">M3</span></td><td>Distributive</td><td>a(b+c) = ab+ac &nbsp;and&nbsp; (a+b)c = ac+bc</td></tr>
+                        <tr><td><span class="pill pill-gold">M4</span></td><td>Commutativity (×)</td><td>ab = ba &nbsp;→ <em>Commutative ring</em></td></tr>
+                        <tr><td><span class="pill pill-gold">M5</span></td><td>Multiplicative identity</td><td>∃ 1 such that a·1 = 1·a = a &nbsp;→ adds <em>Integral domain</em></td></tr>
+                        <tr><td><span class="pill pill-gold">M6</span></td><td>No zero divisors</td><td>ab = 0 ⟹ a = 0 or b = 0</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="callout callout-violet" style="margin-top:10px">Ring = Abelian group + M1–M3. Commutative ring adds M4. Integral domain adds M5–M6.</div>
+                </div>
+
+                <p class="sec-title">5.3 — Fields</p>
+                <div class="card">
+                    <p style="font-size:13.5px">A <strong>field</strong> {F, +, ×} is an integral domain (A1–M6) plus:</p>
+                    <table class="dt" style="margin-top:10px">
+                        <thead><tr><th>Axiom</th><th>Statement</th></tr></thead>
+                        <tbody>
+                        <tr><td><span class="pill pill-green">M7</span> <strong>Multiplicative inverse</strong></td><td>∀ a ∈ F, a ≠ 0, ∃ a⁻¹ ∈ F such that aa⁻¹ = 1</td></tr>
+                        </tbody>
+                    </table>
+                    <p style="font-size:13.5px;margin-top:10px">A field is a set where we can do <strong>addition, subtraction, multiplication, and division without leaving the set</strong>. Division: a/b = a(b⁻¹).</p>
+                    <div class="grid2" style="margin-top:12px">
+                        <div style="background:var(--c-green-l);border:1px solid var(--c-green-m);border-radius:var(--r);padding:12px">
+                            <div style="font-size:12px;font-weight:700;color:var(--c-green);margin-bottom:4px">Examples of fields</div>
+                            <p style="font-size:13px;color:var(--ink2)">Rational numbers ℚ<br>Real numbers ℝ<br>Complex numbers ℂ<br>GF(p) — integers mod prime p</p>
+                        </div>
+                        <div style="background:var(--c-coral-l);border:1px solid var(--c-coral-m);border-radius:var(--r);padding:12px">
+                            <div style="font-size:12px;font-weight:700;color:var(--c-coral);margin-bottom:4px">NOT a field</div>
+                            <p style="font-size:13px;color:var(--ink2)">The integers ℤ — because not every element has a multiplicative inverse (e.g., 2⁻¹ ∉ ℤ).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:4px">
+                    <div class="card-title">Hierarchy: Groups → Rings → Fields (Fig 5.1)</div>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+                        <div style="background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ink2)">
+                            <strong style="color:var(--c-gray)">Group</strong> — A1–A4 (Closure, Associativity, Identity, Inverse)
+                        </div>
+                        <div style="background:rgba(56,217,245,.06);border:1px solid var(--c-cyan-m);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ink2);margin-left:16px">
+                            <strong style="color:var(--c-cyan)">Abelian Group</strong> — adds A5 (Commutativity)
+                        </div>
+                        <div style="background:rgba(167,139,250,.06);border:1px solid var(--c-violet-m);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ink2);margin-left:32px">
+                            <strong style="color:var(--c-violet)">Ring</strong> — Abelian + M1–M3 (Mult closure, assoc, distributive)
+                        </div>
+                        <div style="background:rgba(167,139,250,.08);border:1px solid var(--c-violet-m);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ink2);margin-left:48px">
+                            <strong style="color:var(--c-violet)">Commutative Ring</strong> — adds M4 · <strong>Integral Domain</strong> — adds M5–M6
+                        </div>
+                        <div style="background:rgba(52,211,153,.07);border:1px solid var(--c-green-m);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ink2);margin-left:64px">
+                            <strong style="color:var(--c-green)">Field</strong> — adds M7 (Multiplicative inverse for all nonzero)
+                        </div>
+                        <div style="background:rgba(52,211,153,.1);border:1px solid var(--c-green-m);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ink2);margin-left:80px">
+                            <strong style="color:var(--c-cyan)">Finite Field (Galois Field)</strong> — Field with finite number of elements
+                        </div>
+                    </div>
+                </div>
+
+                <p class="sec-title">5.4 — Finite Fields: GF(p)</p>
+                <div class="card">
+                    <p style="font-size:13.5px">The order of a finite field must be a <strong>power of a prime pⁿ</strong> (n ≥ 1). GF(pⁿ) = Galois field of order pⁿ, named after Évariste Galois (1811–1832).</p>
+                    <div class="grid2" style="margin-top:12px">
+                        <div>
+                            <div class="card-title">GF(p) — Properties</div>
+                            <ol style="margin-left:16px;line-height:2.2;font-size:13.5px">
+                                <li>Consists of <strong>p elements</strong></li>
+                                <li>Addition and multiplication defined over the set</li>
+                                <li>All four arithmetic operations possible without leaving the set</li>
+                                <li>Each non-zero element has a <strong>multiplicative inverse</strong></li>
+                            </ol>
+                        </div>
+                        <div>
+                            <div class="card-title">Construction</div>
+                            <p style="font-size:13.5px">Elements of GF(p) = integers {0, 1, …, p−1}. Arithmetic operations = addition and multiplication <strong>mod p</strong>.</p>
+                            <div class="formula formula-blue" style="margin-top:8px">Example: GF(7) = {0,1,2,3,4,5,6}
+                                3 + 5 = 8 mod 7 = 1
+                                3 × 5 = 15 mod 7 = 1
+                                ∴ 3 and 5 are multiplicative inverses in GF(7)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="sec-title">5.5 — Polynomial Arithmetic over GF(2)</p>
+                <div class="card">
+                    <p style="font-size:13.5px">Polynomials with binary (0 or 1) coefficients. Operations are performed <strong>mod 2</strong> (coefficient arithmetic) and, for GF(2ⁿ), also mod an irreducible polynomial of degree n.</p>
+                    <div class="grid3" style="margin-top:12px">
+                        <div style="background:var(--c-blue-l);border:1px solid var(--c-blue-m);border-radius:var(--r);padding:12px">
+                            <div style="font-size:12px;font-weight:700;color:var(--c-cyan);margin-bottom:6px">Addition / Subtraction</div>
+                            <p style="font-size:12.5px;color:var(--ink2)">Coefficient addition mod 2 = <strong>XOR</strong>. In GF(2), addition and subtraction are identical.</p>
+                            <div style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--c-cyan);margin-top:6px">(x⁷+x⁵+x⁴+x³+x+1) + (x⁷+x³+x) = x⁵+x⁴+1</div>
+                        </div>
+                        <div style="background:var(--c-violet-l);border:1px solid var(--c-violet-m);border-radius:var(--r);padding:12px">
+                            <div style="font-size:12px;font-weight:700;color:var(--c-violet);margin-bottom:6px">Multiplication</div>
+                            <p style="font-size:12.5px;color:var(--ink2)">Ordinary polynomial multiplication, then reduce coefficients mod 2 (XOR). For GF(2ⁿ): also reduce mod irreducible polynomial.</p>
+                            <div style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--c-violet);margin-top:6px">Implemented by: shift and XOR</div>
+                        </div>
+                        <div style="background:var(--c-gold-l);border:1px solid var(--c-gold-m);border-radius:var(--r);padding:12px">
+                            <div style="font-size:12px;font-weight:700;color:var(--c-gold);margin-bottom:6px">Modular Reduction</div>
+                            <p style="font-size:12.5px;color:var(--ink2)">Repeatedly substitute highest power with remainder of irreducible polynomial (shift and XOR).</p>
+                            <div style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--c-gold);margin-top:6px">AES uses: x⁸+x⁴+x³+x+1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="sec-title">5.6 — GF(2ⁿ) and Two Uses of mod</p>
+                <div class="card">
+                    <p style="font-size:13.5px"><strong>GF(2ⁿ)</strong> contains 2ⁿ elements, each represented as an n-bit string (polynomial with binary coefficients of degree ≤ n−1).</p>
+                    <div class="grid2" style="margin-top:12px">
+                        <div style="background:var(--c-cyan-l);border:1px solid var(--c-cyan-m);border-radius:var(--r);padding:12px">
+                            <div style="font-size:12px;font-weight:700;color:var(--c-cyan);margin-bottom:4px">Use 1 of mod</div>
+                            <p style="font-size:13px;color:var(--ink2)"><strong>mod p</strong> on integers — reduces coefficients to {0,1,…,p−1}. In GF(2ⁿ), this is mod 2, giving binary coefficients only.</p>
+                        </div>
+                        <div style="background:var(--c-violet-l);border:1px solid var(--c-violet-m);border-radius:var(--r);padding:12px">
+                            <div style="font-size:12px;font-weight:700;color:var(--c-violet);margin-bottom:4px">Use 2 of mod</div>
+                            <p style="font-size:13px;color:var(--ink2)"><strong>mod p(x)</strong> on polynomials — reduces the result polynomial by an irreducible polynomial, keeping the degree below n.</p>
+                        </div>
+                    </div>
+                    <div class="callout callout-cyan" style="margin-top:12px"><strong>Why GF(2⁸) matters for AES:</strong> AES operates on bytes (8 bits) as elements of GF(2⁸). Each byte is a polynomial in GF(2⁸), and the S-box is defined as a multiplicative inverse in GF(2⁸) mod (x⁸+x⁴+x³+x+1).</div>
+                </div>
+
+                <p class="sec-title">5.7 — GF(2³) Table — Generator x³ + x + 1</p>
+                <div class="card">
+                    <div class="card-title">Table 5.5 — All nonzero elements of GF(2³)</div>
+                    <table class="dt" style="margin-top:10px">
+                        <thead><tr><th>Power</th><th>Polynomial</th><th>Binary</th><th>Decimal</th></tr></thead>
+                        <tbody>
+                        <tr><td>0</td><td>0</td><td>000</td><td>0</td></tr>
+                        <tr><td>g⁰ (=g⁷)</td><td>1</td><td>001</td><td>1</td></tr>
+                        <tr><td>g¹</td><td>g</td><td>010</td><td>2</td></tr>
+                        <tr><td>g²</td><td>g²</td><td>100</td><td>4</td></tr>
+                        <tr><td>g³</td><td>g + 1</td><td>011</td><td>3</td></tr>
+                        <tr><td>g⁴</td><td>g² + g</td><td>110</td><td>6</td></tr>
+                        <tr><td>g⁵</td><td>g² + g + 1</td><td>111</td><td>7</td></tr>
+                        <tr><td>g⁶</td><td>g² + 1</td><td>101</td><td>5</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="callout callout-violet" style="margin-top:10px">The generator g = x satisfies g³ + g + 1 = 0 (since x³ + x + 1 is the irreducible polynomial). Its powers cycle through all 7 nonzero elements.</div>
+                </div>
+            </div>
+
+            <!-- L5 INTERACTIVE TOOLS -->
+            <div class="sec-panel" id="lec5-tools">
+                <div class="lec-hero"><div class="lec-hero-num">05</div><div class="lec-hero-info"><h2>Interactive Tools · Lecture 5</h2><p>GF(p) arithmetic · Polynomial XOR · Axiom checker</p></div></div>
+
+                <p class="sec-title">GF(p) Arithmetic Calculator</p>
+                <div class="card">
+                    <p style="font-size:13px;margin-bottom:12px">Perform arithmetic in GF(p) — all four operations mod a prime. Every nonzero element has a multiplicative inverse.</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
+                        <div><label style="font-size:11px;color:var(--ink3);display:block;margin-bottom:4px">a</label><input type="number" id="gfp-a" value="5" style="width:80px"></div>
+                        <div><label style="font-size:11px;color:var(--ink3);display:block;margin-bottom:4px">op</label>
+                            <select id="gfp-op" style="padding:9px 8px;background:var(--paper2);border:1px solid rgba(77,127,255,.3);border-radius:var(--r);color:var(--ink);font-family:'DM Mono',monospace;font-size:0.9rem;outline:none">
+                                <option value="add">+</option><option value="sub">−</option><option value="mul">×</option><option value="div">÷</option>
+                            </select>
+                        </div>
+                        <div><label style="font-size:11px;color:var(--ink3);display:block;margin-bottom:4px">b</label><input type="number" id="gfp-b" value="3" style="width:80px"></div>
+                        <div><label style="font-size:11px;color:var(--ink3);display:block;margin-bottom:4px">in GF(p), p =</label><input type="number" id="gfp-p" value="7" min="2" max="97" style="width:80px"></div>
+                        <button class="tool-btn tool-btn-blue" onclick="calcGFp()">Compute</button>
+                    </div>
+                    <div id="gfp-result" class="tool-out tool-out-blue">Result will appear here…</div>
+                </div>
+
+                <p class="sec-title">GF(2) Polynomial XOR Calculator</p>
+                <div class="card">
+                    <p style="font-size:13px;margin-bottom:12px">Enter two polynomials as binary bit strings (e.g. <code>10110011</code> = x⁷+x⁵+x⁴+x+1). Addition in GF(2ⁿ) = XOR.</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
+                        <div style="flex:1;min-width:140px"><label style="font-size:11px;color:var(--ink3);display:block;margin-bottom:4px">Poly A (bits)</label><input type="text" id="poly-a" value="10110011" maxlength="16" style="width:100%;font-size:0.88rem"></div>
+                        <div style="flex:1;min-width:140px"><label style="font-size:11px;color:var(--ink3);display:block;margin-bottom:4px">Poly B (bits)</label><input type="text" id="poly-b" value="01010101" maxlength="16" style="width:100%;font-size:0.88rem"></div>
+                        <button class="tool-btn tool-btn-blue" onclick="calcPolyXOR()">XOR (Add)</button>
+                    </div>
+                    <div id="poly-result" class="tool-out tool-out-blue">Result will appear here…</div>
+                </div>
+
+                <p class="sec-title">Algebraic Structure Checker</p>
+                <div class="card">
+                    <p style="font-size:13px;margin-bottom:14px">Select a mathematical structure and an example set — the tool checks which axioms it satisfies.</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px">
+                        <div><label style="font-size:11px;color:var(--ink3);display:block;margin-bottom:4px">Example set</label>
+                            <select id="axm-set" style="padding:9px 10px;background:var(--paper2);border:1px solid rgba(77,127,255,.3);border-radius:var(--r);color:var(--ink);font-family:'Outfit',sans-serif;font-size:0.88rem;outline:none">
+                                <option value="integers">Integers ℤ (under +)</option>
+                                <option value="zn" selected>Zn (under + and ×)</option>
+                                <option value="gfp">GF(p) prime field</option>
+                                <option value="gf2n">GF(2ⁿ) binary field</option>
+                            </select>
+                        </div>
+                        <button class="tool-btn tool-btn-blue" onclick="checkAxioms()">Check Structure</button>
+                    </div>
+                    <div id="axm-result" class="tool-out tool-out-blue">Result will appear here…</div>
+                </div>
+            </div>
+
+            <!-- L5 QUIZ -->
+            <div class="sec-panel" id="lec5-quiz">
+                <div class="lec-hero"><div class="lec-hero-num">05</div><div class="lec-hero-info"><h2>Practice Questions · Lecture 5</h2><p>10 questions · Easy → Hard · Click to reveal</p></div></div>
+                <div class="prog-wrap"><div class="prog-label" id="l5q-lbl">0 of 10 revealed</div><div class="prog-track"><div class="prog-fill" id="l5q-bar" style="width:0%"></div></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">Groups</span></div><div class="q-text">List the four axioms that define a group. What additional axiom makes it an Abelian group?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>A1: <strong>Closure</strong> — a • b ∈ G<br>A2: <strong>Associativity</strong> — a•(b•c) = (a•b)•c<br>A3: <strong>Identity</strong> — ∃ e: a•e = e•a = a<br>A4: <strong>Inverse</strong> — ∀a ∃a⁻¹: a•a⁻¹ = e<br><br>Adding A5 <strong>Commutativity</strong> (a•b = b•a) makes it an Abelian group.</p></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">Fields</span></div><div class="q-text">What is the one axiom that distinguishes a field from an integral domain?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>Axiom <strong>M7 — Multiplicative inverse</strong>: for each a ∈ F with a ≠ 0, there exists a⁻¹ ∈ F such that aa⁻¹ = 1.<br><br>This is what makes division possible in a field. The integers ℤ fail this — 2 has no multiplicative inverse in ℤ — so ℤ is an integral domain but not a field.</p></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">GF(p)</span></div><div class="q-text">What is GF(p) and how are its elements and arithmetic defined?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>GF(p) (Galois field of order p, where p is prime) consists of the integers {0, 1, …, p−1}. Arithmetic operations are <strong>addition and multiplication mod p</strong>. Every nonzero element has a multiplicative inverse. Named after Évariste Galois (1811–1832).</p></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">GF(2ⁿ)</span></div><div class="q-text">In GF(2ⁿ), what operations correspond to polynomial addition and how are they implemented computationally?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>Polynomial addition in GF(2ⁿ) = <strong>XOR</strong> of the corresponding bit strings. Since coefficients are 0 or 1 and are reduced mod 2, addition and subtraction are identical.<br><br>Computationally: addition = XOR, multiplication = shift and XOR, modular reduction = repeated substitution of highest power using the irreducible polynomial (also shift and XOR).</p></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">Order</span></div><div class="q-text">What must the order of a finite field be?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>The order of a finite field must be a <strong>power of a prime pⁿ</strong>, where p is prime and n is a positive integer. The finite field is written GF(pⁿ). You cannot have a finite field with, say, 6 or 10 elements, since 6 = 2×3 and 10 = 2×5 are not prime powers.</p></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-med">Medium</span><span class="badge badge-topic">Hierarchy</span></div><div class="q-text">Place these structures in order from least to most properties: Field, Ring, Abelian group, Integral domain, Group, Commutative ring, Finite field.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>Group (A1–A4) ⊂ Abelian group (A1–A5) ⊂ Ring (A1–A5 + M1–M3) ⊂ Commutative ring (adds M4) ⊂ Integral domain (adds M5–M6) ⊂ Field (adds M7) ⊂ Finite field (Field with finite number of elements)</p></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-med">Medium</span><span class="badge badge-topic">Two Uses of mod</span></div><div class="q-text">Explain the two different uses of the mod operator in GF(2ⁿ).</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p><strong>Use 1: mod p (integer modulus)</strong> — reduces coefficients of polynomial terms. In GF(2ⁿ), this is mod 2, keeping all coefficients as 0 or 1.<br><br><strong>Use 2: mod p(x) (polynomial modulus)</strong> — reduces the result polynomial by an irreducible polynomial of degree n, keeping the degree of the result below n so it stays within the field.<br><br>Both uses are needed together in GF(2ⁿ): first reduce coefficients mod 2, then reduce the polynomial mod the irreducible polynomial.</p></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-med">Medium</span><span class="badge badge-topic">Cyclic Groups</span></div><div class="q-text">What is a cyclic group and what is a generator?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>A group G is <strong>cyclic</strong> if every element of G is a power aᵏ (k an integer) of a fixed element a ∈ G. That element a is called a <strong>generator</strong> of G.<br><br>Key properties: every cyclic group is Abelian; it may be finite or infinite. In a finite field GF(pⁿ), a root of an irreducible polynomial is a generator — its powers enumerate all nonzero elements, as shown in Table 5.5 for GF(2³) with generator satisfying x³+x+1=0.</p></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-hard">Hard</span><span class="badge badge-topic">GF(2³)</span></div><div class="q-text">Using GF(2³) with irreducible polynomial x³+x+1, compute g³ and explain why using the generator table.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>From Table 5.5: g³ = <strong>g + 1</strong> (binary 011, decimal 3).<br><br>Derivation: g is defined as a root of x³+x+1=0, so g³ = −g−1 = g+1 (in GF(2), −1 = 1, so subtraction = addition).<br><br>g³ + g + 1 = 0 → g³ = g + 1 (mod 2 coefficient arithmetic). This confirms the table entry. Powers g⁰ through g⁶ generate all 7 nonzero elements of GF(2³) = {0, 1, 2, 3, 4, 5, 6} in binary representation.</p></div></div>
+
+                <div class="q-card" data-key="l5q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-hard">Hard</span><span class="badge badge-topic">Application</span></div><div class="q-text">Why do cryptographic algorithms like AES operate in GF(2⁸) rather than ordinary integer arithmetic?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>AES processes bytes (8-bit values), so it needs a mathematical structure over 8-bit strings. GF(2⁸) provides this because:<br><br>1. <strong>Closure</strong> — all operations stay within 8-bit values (no overflow issues).<br>2. <strong>Multiplicative inverses exist</strong> — every nonzero byte has an inverse, enabling the S-box substitution (critical for confusion).<br>3. <strong>Efficient hardware implementation</strong> — GF(2⁸) operations reduce to XOR and shifts, which are fast in hardware and software.<br>4. <strong>Well-defined structure</strong> — the algebraic properties guarantee security-relevant behavior like the avalanche effect when implemented correctly.<br><br>If ordinary integer arithmetic were used, overflow management would break the bijective property of the S-box, and multiplicative inverses wouldn't be guaranteed.</p></div></div>
+            </div>
+
+            <!-- L5 KEY FACTS -->
+            <div class="sec-panel" id="lec5-keyfacts">
+                <div class="lec-hero"><div class="lec-hero-num">05</div><div class="lec-hero-info"><h2>Key Facts · Lecture 5</h2></div></div>
+                <input class="fs-search" type="text" placeholder="🔍 Search facts…" oninput="filterFS(this)">
+                <div class="fs-group">
+                    <div class="fs-group-lbl">Algebraic Structures</div>
+                    <div class="fs-row" data-s="group axioms A1 A2 A3 A4 closure associativity identity inverse"><div class="fs-name">Group axioms</div><div class="fs-desc">Required axioms (A1–A4)</div><div class="fs-val" style="border-color:var(--c-gray);background:var(--c-gray-l);color:var(--c-gray)">Closure · Assoc · Identity · Inverse</div></div>
+                    <div class="fs-row" data-s="abelian group commutative A5"><div class="fs-name">Abelian group</div><div class="fs-desc">Added axiom vs plain group</div><div class="fs-val" style="border-color:var(--c-cyan);background:var(--c-cyan-l);color:var(--c-cyan)">+ A5 Commutativity</div></div>
+                    <div class="fs-row" data-s="ring abelian M1 M2 M3 closure multiplication distributive"><div class="fs-name">Ring</div><div class="fs-desc">Built on Abelian group</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">Abelian + M1 M2 M3</div></div>
+                    <div class="fs-row" data-s="integral domain commutative ring M4 M5 M6 no zero divisors"><div class="fs-name">Integral Domain</div><div class="fs-desc">Extends commutative ring</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">Comm. ring + M5 (id) + M6 (no zero div)</div></div>
+                    <div class="fs-row" data-s="field M7 multiplicative inverse division"><div class="fs-name">Field</div><div class="fs-desc">Key distinguishing axiom</div><div class="fs-val" style="border-color:var(--c-green);background:var(--c-green-l);color:var(--c-green)">Integral domain + M7 (mult inverse)</div></div>
+                    <div class="fs-row" data-s="integers not field Z no multiplicative inverse"><div class="fs-name">Integers ℤ</div><div class="fs-desc">Why they are NOT a field</div><div class="fs-val" style="border-color:var(--c-coral);background:var(--c-coral-l);color:var(--c-coral)">No mult inverse for most elements</div></div>
+                </div>
+                <div class="fs-group">
+                    <div class="fs-group-lbl">Galois Fields</div>
+                    <div class="fs-row" data-s="finite field order prime power pn Galois"><div class="fs-name">Finite field order</div><div class="fs-desc">Must be…</div><div class="fs-val" style="border-color:var(--c-blue);background:var(--c-blue-l);color:var(--c-blue)">A power of a prime pⁿ</div></div>
+                    <div class="fs-row" data-s="GF p elements integers mod prime arithmetic"><div class="fs-name">GF(p) elements</div><div class="fs-desc">Set and arithmetic</div><div class="fs-val" style="border-color:var(--c-cyan);background:var(--c-cyan-l);color:var(--c-cyan)">{0,1,…,p−1} with add and mult mod p</div></div>
+                    <div class="fs-row" data-s="GF 2n addition XOR polynomial binary"><div class="fs-name">GF(2ⁿ) addition</div><div class="fs-desc">Computational operation</div><div class="fs-val" style="border-color:var(--c-blue);background:var(--c-blue-l);color:var(--c-blue)">XOR of bit strings</div></div>
+                    <div class="fs-row" data-s="GF 2n multiplication shift XOR"><div class="fs-name">GF(2ⁿ) multiplication</div><div class="fs-desc">Computational operation</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">Shift and XOR</div></div>
+                    <div class="fs-row" data-s="AES GF 2^8 irreducible polynomial"><div class="fs-name">AES uses</div><div class="fs-desc">Field and irreducible polynomial</div><div class="fs-val" style="border-color:var(--c-gold);background:var(--c-gold-l);color:var(--c-gold)">GF(2⁸) mod x⁸+x⁴+x³+x+1</div></div>
+                    <div class="fs-row" data-s="two uses mod integer polynomial coefficients"><div class="fs-name">Two uses of mod in GF(2ⁿ)</div><div class="fs-desc">Both are needed</div><div class="fs-val" style="border-color:var(--c-cyan);background:var(--c-cyan-l);color:var(--c-cyan)">mod 2 (coefficients) + mod p(x) (degree)</div></div>
+                    <div class="fs-row" data-s="cyclic group generator all elements powers"><div class="fs-name">Cyclic group generator</div><div class="fs-desc">Definition</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">Element whose powers = all group elements</div></div>
+                </div>
+            </div>
+        </div><!-- /lec5 -->
+
     </div><!-- #main -->
 </div><!-- #app -->
 
@@ -1078,12 +1366,14 @@
         2:{num:'02',title:'Number Theory',sub:'4 sections · GCD · Modular · Fermat'},
         3:{num:'03',title:'Classical Ciphers',sub:'4 sections · Caesar · Vigenère · OTP'},
         4:{num:'04',title:'Block Ciphers & DES',sub:'4 sections · Feistel · DES · Avalanche'},
+        5:{num:'05',title:'Finite Fields',sub:'4 sections · Groups · GF(p) · GF(2ⁿ) · Polynomials'},
     };
     const secConfigs = {
         l1:[{id:'summary',icon:'📋',label:'Summary Notes'},{id:'flashcards',icon:'🃏',label:'Flashcards'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
         l2:[{id:'summary',icon:'📐',label:'Summary Notes'},{id:'tools',icon:'⚙️',label:'Interactive Tools'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
         l3:[{id:'summary',icon:'🔐',label:'Summary Notes'},{id:'tools',icon:'⚙️',label:'Cipher Tools'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
         l4:[{id:'summary',icon:'🧱',label:'Summary Notes'},{id:'flashcards',icon:'🃏',label:'Flashcards'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
+        l5:[{id:'summary',icon:'∞',label:'Summary Notes'},{id:'tools',icon:'⚙️',label:'Interactive Tools'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
     };
     let curLec='l1', curSec='summary';
 
@@ -1098,7 +1388,7 @@
         document.getElementById('sb-num').textContent = m.num||('0'+n);
         document.getElementById('sb-title').textContent = m.title||('Lecture '+n);
         document.getElementById('sb-sub').textContent = m.sub||'';
-        document.getElementById('brand-icon').textContent = ['🔒','📐','🔐','🧱'][n-1]||'🔒';
+        document.getElementById('brand-icon').textContent = ['🔒','📐','🔐','🧱','∞'][n-1]||'🔒';
         buildSecTabs();
         showSec('summary');
     }
@@ -1195,8 +1485,20 @@
             {f:"List the 6 Feistel cipher design parameters.",b:"1. Block size (larger → more secure, slower)\n2. Key size (larger → more secure)\n3. Number of rounds (more → more secure; DES = 16)\n4. Subkey generation algorithm\n5. Round function F\n6. Fast software enc/dec"},
             {f:"What is Triple DES and why was it introduced?",b:"Applies DES 3 times: Encrypt(K1) → Decrypt(K2) → Encrypt(K3).\nEffective key length: 168 bits.\nIntroduced because 56-bit DES was too weak for modern threats. Replaced by AES in 2001."},
         ],
+        l5:[
+            {f:"List the 4 group axioms. What makes a group Abelian?",b:"A1 Closure · A2 Associativity · A3 Identity · A4 Inverse\n\nAdding A5 Commutativity (a•b = b•a) makes it an ABELIAN group."},
+            {f:"What is the one axiom that makes a field different from an integral domain?",b:"M7 — MULTIPLICATIVE INVERSE: for each a ≠ 0 in F, there exists a⁻¹ ∈ F such that aa⁻¹ = 1.\n\nThis enables division: a/b = a(b⁻¹)."},
+            {f:"What must the order of a finite field be?",b:"A POWER OF A PRIME: pⁿ where p is prime and n ≥ 1.\nNotation: GF(pⁿ) = Galois field.\nNamed after Évariste Galois (1811–1832, died age 20)."},
+            {f:"What is GF(p) and how is arithmetic defined?",b:"Elements: {0, 1, …, p−1} where p is prime.\nArithmetic: addition and multiplication MOD p.\nEvery nonzero element has a multiplicative inverse."},
+            {f:"In GF(2ⁿ), what does addition equal computationally?",b:"Addition = XOR of bit strings.\nSubtraction = same as addition (in mod 2).\nMultiplication = shift and XOR.\nModular reduction = repeated substitution using irreducible polynomial."},
+            {f:"Explain the TWO uses of mod in GF(2ⁿ).",b:"Use 1: mod 2 (mod p) — reduces coefficients to 0 or 1 (binary coefficients only).\nUse 2: mod p(x) — reduces result polynomial using irreducible polynomial, keeping degree < n.\nBOTH are required."},
+            {f:"Why are the integers ℤ NOT a field?",b:"ℤ is an integral domain but NOT a field because most integers have no multiplicative inverse within ℤ.\nExample: 2 × ? = 1 has no integer solution.\nRational numbers ℚ, reals ℝ, and GF(p) ARE fields."},
+            {f:"What is a cyclic group and generator?",b:"G is cyclic if every element is a power aᵏ of a fixed element a.\nThat element a is the GENERATOR of G.\nA cyclic group is always Abelian. May be finite or infinite."},
+            {f:"GF(2³) with x³+x+1: what is g³?",b:"g³ = g + 1  (binary 011, decimal 3).\nBecause g satisfies g³+g+1=0 → g³ = g+1 (mod 2).\nPowers g⁰–g⁶ generate all 7 nonzero elements of GF(2³)."},
+            {f:"Why does AES use GF(2⁸) instead of ordinary integer arithmetic?",b:"GF(2⁸) provides:\n• Closure — all results stay in 8 bits\n• Multiplicative inverses — needed for S-box (confusion)\n• Efficient hardware — reduces to XOR and shifts\n• Well-defined algebraic structure for security\n\nIrreducible polynomial: x⁸+x⁴+x³+x+1"},
+        ],
     };
-    const fcIdx = {l1:0, l2:0, l3:0, l4:0};
+    const fcIdx = {l1:0, l2:0, l3:0, l4:0, l5:0};
 
     function renderFC(lec){
         const cards = flashcards[lec]; if(!cards) return;
@@ -1442,15 +1744,129 @@
         res.textContent = lines.join('\n');
     }
 
+    // ── TOOL: GF(p) Arithmetic ──
+    function isPrime(n){ if(n<2) return false; for(let i=2;i<=Math.sqrt(n);i++) if(n%i===0) return false; return true; }
+    function modInverse(a, p){
+        // Extended Euclidean algorithm
+        a = ((a % p) + p) % p;
+        if(a === 0) return null;
+        let [old_r, r] = [a, p], [old_s, s] = [1, 0];
+        while(r !== 0){ const q = Math.floor(old_r/r); [old_r,r]=[r,old_r-q*r]; [old_s,s]=[s,old_s-q*s]; }
+        return ((old_s % p) + p) % p;
+    }
+    function calcGFp(){
+        const a = parseInt(document.getElementById('gfp-a').value);
+        const b = parseInt(document.getElementById('gfp-b').value);
+        const p = parseInt(document.getElementById('gfp-p').value);
+        const op = document.getElementById('gfp-op').value;
+        const res = document.getElementById('gfp-result');
+        if(isNaN(a)||isNaN(b)||isNaN(p)){res.textContent='Enter valid numbers.';return;}
+        if(!isPrime(p)){res.textContent=`p = ${p} is NOT prime. GF(p) requires a prime modulus.`;return;}
+        const am = ((a%p)+p)%p, bm = ((b%p)+p)%p;
+        let result, sym, detail='';
+        if(op==='add'){ sym='+'; result=(am+bm)%p; detail=`${am} + ${bm} = ${am+bm} ≡ ${result} (mod ${p})`; }
+        else if(op==='sub'){ sym='−'; result=((am-bm)%p+p)%p; detail=`${am} − ${bm} = ${am-bm} ≡ ${result} (mod ${p})`; }
+        else if(op==='mul'){ sym='×'; result=(am*bm)%p; detail=`${am} × ${bm} = ${am*bm} ≡ ${result} (mod ${p})`; }
+        else {
+            sym='÷';
+            if(bm===0){ res.textContent='Division by zero is undefined.'; return; }
+            const bInv = modInverse(bm, p);
+            result=(am*bInv)%p;
+            detail=`${am} ÷ ${bm} = ${am} × ${bm}⁻¹ mod ${p}\n${bm}⁻¹ mod ${p} = ${bInv}  (since ${bm} × ${bInv} = ${bm*bInv} ≡ 1 mod ${p})\n= ${am} × ${bInv} = ${am*bInv} ≡ ${result} (mod ${p})`;
+        }
+        res.textContent = `GF(${p}): ${am} ${sym} ${bm} = ${result}\n\n${detail}`;
+    }
+
+    // ── TOOL: Polynomial XOR ──
+    function bitsToPolyStr(bits){
+        const b = bits.replace(/[^01]/g,'');
+        const n = b.length - 1;
+        const terms = [];
+        for(let i=0;i<b.length;i++){ if(b[i]==='1'){ const exp=n-i; if(exp>1) terms.push(`x${exp>1?'⁰¹²³⁴⁵⁶⁷⁸⁹'[exp]||'^'+exp:''}`); else if(exp===1) terms.push('x'); else terms.push('1'); } }
+        return terms.length ? terms.join('+') : '0';
+    }
+    function bitsToPolyStrClean(bits){
+        const b = bits.replace(/[^01]/g,'').replace(/^0+/,'') || '0';
+        const n = b.length - 1;
+        const terms = [];
+        for(let i=0;i<b.length;i++){
+            if(b[i]==='1'){
+                const exp=n-i;
+                const sup=['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'];
+                if(exp>1) terms.push('x'+sup[exp]||'x^'+exp);
+                else if(exp===1) terms.push('x');
+                else terms.push('1');
+            }
+        }
+        return terms.length ? terms.join(' + ') : '0';
+    }
+    function calcPolyXOR(){
+        const ra = document.getElementById('poly-a').value.replace(/[^01]/g,'');
+        const rb = document.getElementById('poly-b').value.replace(/[^01]/g,'');
+        const res = document.getElementById('poly-result');
+        if(!ra||!rb){res.textContent='Enter binary strings.';return;}
+        const maxLen = Math.max(ra.length, rb.length);
+        const a = ra.padStart(maxLen,'0');
+        const b = rb.padStart(maxLen,'0');
+        let xorBits = '';
+        for(let i=0;i<maxLen;i++) xorBits += (parseInt(a[i])^parseInt(b[i])).toString();
+        const trimmed = xorBits.replace(/^0+/,'') || '0';
+        res.textContent =
+            `A  = ${a}  →  ${bitsToPolyStrClean(a)}\nB  = ${b}  →  ${bitsToPolyStrClean(b)}\nA⊕B = ${xorBits}  →  ${bitsToPolyStrClean(xorBits)}\n\nResult (trimmed): ${trimmed}\n\nNote: Addition in GF(2ⁿ) = XOR. Subtraction = same as addition.`;
+    }
+
+    // ── TOOL: Axiom Checker ──
+    function checkAxioms(){
+        const set = document.getElementById('axm-set').value;
+        const res = document.getElementById('axm-result');
+        const checks = {
+            integers:{
+                name:'Integers ℤ under + and ×',
+                A1:'✓ Closed under +',A2:'✓ Associative under +',A3:'✓ Identity: 0',A4:'✓ Additive inverse: −n',A5:'✓ Commutative under +',
+                M1:'✓ Closed under ×',M2:'✓ Associative under ×',M3:'✓ Distributive',M4:'✓ Commutative under ×',
+                M5:'✓ Multiplicative identity: 1',M6:'✓ No zero divisors',M7:'✗ No mult inverse (e.g. 2⁻¹ ∉ ℤ)',
+                verdict:'INTEGRAL DOMAIN (not a field)',color:'var(--c-gold)'
+            },
+            zn:{
+                name:'Zn = {0,1,…,n−1} under + and × mod n',
+                A1:'✓ Closed under + mod n',A2:'✓ Associative',A3:'✓ Identity: 0',A4:'✓ Additive inverse: n−a',A5:'✓ Commutative',
+                M1:'✓ Closed under × mod n',M2:'✓ Associative',M3:'✓ Distributive',M4:'✓ Commutative',
+                M5:'✓ Multiplicative identity: 1',M6:'✗ Zero divisors exist if n is composite (e.g. in Z6: 2×3=6≡0)',M7:'✗ Mult inverse only if gcd(a,n)=1',
+                verdict:'RING (becomes a field when n is prime → GF(p))',color:'var(--c-violet)'
+            },
+            gfp:{
+                name:'GF(p) = integers {0,…,p−1} mod prime p',
+                A1:'✓ A2:✓ A3:✓ A4:✓ A5:✓ — Abelian group under +',
+                M1:'✓ M2:✓ M3:✓ M4:✓ — Commutative ring',
+                M5:'✓ Identity: 1',M6:'✓ No zero divisors (p is prime)',M7:'✓ Every nonzero element has mult inverse mod p',
+                verdict:'FINITE FIELD — All 7 axioms satisfied (A1–M7)',color:'var(--c-green)'
+            },
+            gf2n:{
+                name:'GF(2ⁿ) — polynomials mod irreducible poly of degree n',
+                A1:'✓ Closed (XOR stays in n bits)',A2:'✓ A3:✓ (0 polynomial)',A4:'✓ (self-inverse under XOR)',A5:'✓ XOR is commutative',
+                M1:'✓ Closed (mod irreducible polynomial)',M2:'✓ M3:✓ M4:✓ M5:✓ M6:'+'✓ (irreducible poly ensures no zero divisors)',M7:'✓ Extended Euclidean gives inverse',
+                verdict:'FINITE FIELD GF(2ⁿ) — All axioms satisfied. Used in AES (GF(2⁸))',color:'var(--c-cyan)'
+            }
+        };
+        const c = checks[set];
+        const lines = [
+            `Structure: ${c.name}`,''
+        ];
+        const axiomKeys = ['A1','A2','A3','A4','A5','M1','M2','M3','M4','M5','M6','M7'];
+        axiomKeys.forEach(k => { if(c[k]) lines.push(c[k]); });
+        lines.push('','Verdict: '+c.verdict);
+        res.textContent = lines.join('\n');
+    }
+
     // ── INIT ──
     document.querySelectorAll('.lec-panel').forEach(p=>p.classList.remove('active'));
     document.querySelectorAll('.sec-panel').forEach(p=>p.classList.remove('active'));
     document.getElementById('lec1').classList.add('active');
     buildSecTabs();
     showSec('summary');
-    ['l1','l2','l3','l4'].forEach(lec=>renderFC(lec));
+    ['l1','l2','l3','l4','l5'].forEach(lec=>renderFC(lec));
     // Run tools with defaults
-    setTimeout(()=>{runGCD();calcTotient();calcMod();caesarRun('enc');runFreq();runVig();runFeistel();calcKeySearch();runAvalanche();},100);
+    setTimeout(()=>{runGCD();calcTotient();calcMod();caesarRun('enc');runFreq();runVig();runFeistel();calcKeySearch();runAvalanche();calcGFp();calcPolyXOR();checkAxioms();},100);
 </script>
 </body>
 </html>
