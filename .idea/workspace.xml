@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="69bc6445-0c41-4327-b29f-73a4ada99654" name="Changes" comment="Lecture 2">
-      <change beforePath="$PROJECT_DIR$/.idea/CNS-study.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" />
-    </list>
+    <list default="true" id="69bc6445-0c41-4327-b29f-73a4ada99654" name="Changes" comment="Update workspace settings and add configurations for Lecture 2" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -116,7 +109,7 @@
       <workItem from="1774823543563" duration="1159000" />
       <workItem from="1774824742098" duration="1082000" />
       <workItem from="1774878277583" duration="1942000" />
-      <workItem from="1774903920721" duration="4668000" />
+      <workItem from="1774903920721" duration="5245000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial HTML structure and styles for Lecture 1 study guide">
       <option name="closed" value="true" />
@@ -150,7 +143,23 @@
       <option name="project" value="LOCAL" />
       <updated>1774908315707</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Add initial styles and JavaScript functionality for lecture tools and flashcards">
+      <option name="closed" value="true" />
+      <created>1774910645626</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1774910645626</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Update workspace settings and add configurations for Lecture 2">
+      <option name="closed" value="true" />
+      <created>1774910660057</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1774910660057</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -160,7 +169,9 @@
     <MESSAGE value="Add initial HTML structure and styles for Lecture 1 study guide" />
     <MESSAGE value="Add XML configuration for Ask2Agent migration and update workspace settings" />
     <MESSAGE value="Lecture 2" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lecture 2" />
+    <MESSAGE value="Add initial styles and JavaScript functionality for lecture tools and flashcards" />
+    <MESSAGE value="Update workspace settings and add configurations for Lecture 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update workspace settings and add configurations for Lecture 2" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
