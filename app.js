@@ -5,6 +5,8 @@
     3:{num:'03',title:'Classical Ciphers',sub:'4 sections · Caesar · Vigenère · OTP'},
     4:{num:'04',title:'Block Ciphers & DES',sub:'4 sections · Feistel · DES · Avalanche'},
     5:{num:'05',title:'Finite Fields',sub:'4 sections · Groups · GF(p) · GF(2ⁿ) · Polynomials'},
+    6:{num:'06',title:'RNG & Stream Ciphers',sub:'4 sections · TRNG · PRNG · RC4 · LFSR'},
+    7:{num:'07',title:'Public Key & RSA',sub:'4 sections · Asymmetric · RSA · Attacks · OAEP'},
   };
   const secConfigs = {
     l1:[{id:'summary',icon:'📋',label:'Summary Notes'},{id:'flashcards',icon:'🃏',label:'Flashcards'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
@@ -12,6 +14,8 @@
     l3:[{id:'summary',icon:'🔐',label:'Summary Notes'},{id:'tools',icon:'⚙️',label:'Cipher Tools'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
     l4:[{id:'summary',icon:'🧱',label:'Summary Notes'},{id:'flashcards',icon:'🃏',label:'Flashcards'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
     l5:[{id:'summary',icon:'∞',label:'Summary Notes'},{id:'tools',icon:'⚙️',label:'Interactive Tools'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
+    l6:[{id:'summary',icon:'🎲',label:'Summary Notes'},{id:'flashcards',icon:'🃏',label:'Flashcards'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
+    l7:[{id:'summary',icon:'🔑',label:'Summary Notes'},{id:'flashcards',icon:'🃏',label:'Flashcards'},{id:'quiz',icon:'❓',label:'Practice Q&A'},{id:'keyfacts',icon:'📊',label:'Key Facts'}],
   };
   let curLec='l1', curSec='summary';
 
@@ -26,7 +30,7 @@
     document.getElementById('sb-num').textContent = m.num||('0'+n);
     document.getElementById('sb-title').textContent = m.title||('Lecture '+n);
     document.getElementById('sb-sub').textContent = m.sub||'';
-    document.getElementById('brand-icon').textContent = ['🔒','📐','🔐','🧱','∞'][n-1]||'🔒';
+    document.getElementById('brand-icon').textContent = ['🔒','📐','🔐','🧱','∞','🎲','🔑'][n-1]||'🔒';
     buildSecTabs();
     showSec('summary');
   }
@@ -134,8 +138,32 @@
       {f:"GF(2³) with x³+x+1: what is g³?",b:"g³ = g + 1  (binary 011, decimal 3).\nBecause g satisfies g³+g+1=0 → g³ = g+1 (mod 2).\nPowers g⁰–g⁶ generate all 7 nonzero elements of GF(2³)."},
       {f:"Why does AES use GF(2⁸) instead of ordinary integer arithmetic?",b:"GF(2⁸) provides:\n• Closure — all results stay in 8 bits\n• Multiplicative inverses — needed for S-box (confusion)\n• Efficient hardware — reduces to XOR and shifts\n• Well-defined algebraic structure for security\n\nIrreducible polynomial: x⁸+x⁴+x³+x+1"},
     ],
+    l6:[
+      {f:"What are the two requirements for cryptographic random numbers?",b:"RANDOMNESS: uniform distribution (equal 1s and 0s) + independence (no subsequence inferable from others).\nUNPREDICTABILITY: forward (can't predict next bit from previous) + backward (can't determine seed from output)."},
+      {f:"TRNG vs PRNG vs PRF — define each.",b:"TRNG: True Random Number Generator — uses physical entropy source, nondeterministic, aperiodic, inefficient.\nPRNG: Pseudorandom Number Generator — uses seed + deterministic algorithm, periodic, efficient. Produces open-ended bit stream.\nPRF: Pseudorandom Function — same as PRNG but produces fixed-length output (keys, nonces)."},
+      {f:"State the Linear Congruential Generator formula.",b:"X_{n+1} = (aX_n + c) mod m\nParameters: m (modulus), a (multiplier), c (increment), X₀ (seed).\nNOT cryptographically secure — observable outputs reveal parameters."},
+      {f:"Blum Blum Shub: how does it work and why is it secure?",b:"X_{i+1} = X_i² mod n (n = p×q, primes ≡ 3 mod 4)\nOutput = least significant bit of each X_i.\nSecurity: based on difficulty of FACTORING n.\nPasses the next-bit test → CSPRBG."},
+      {f:"What are the two block cipher modes used to build PRNGs?",b:"CTR mode: Counter incremented and encrypted each iteration. Recommended in NIST SP 800-90.\nOFB mode: Output fed back as next input. Recommended in X9.82 and RFC 4086."},
+      {f:"RC4: who designed it, what is it, and why is it deprecated?",b:"Designed by Ron Rivest in 1987. Variable key size byte-oriented stream cipher based on random permutation of 256 bytes.\nDeprecated: key scheduling vulnerability + keystream biases → RFC 7465 prohibits RC4 in TLS. NIST also prohibits for government use."},
+      {f:"Three stream cipher design considerations.",b:"1. LARGE PERIOD — longer before repeat → harder to cryptanalyze.\n2. APPROXIMATE TRUE RANDOMNESS — equal 1s/0s, all 256 byte values equally frequent.\n3. KEY LENGTH ≥ 128 BITS — same considerations as block ciphers."},
+      {f:"LFSR vs NFSR — what does each provide?",b:"LFSR: Linear feedback (XOR). Provides minimum period guarantee + balancedness. Well-understood theory.\nNFSR: Nonlinear feedback (AND + XOR). Provides NONLINEARITY essential for cryptographic security.\nGrain-128a uses BOTH together."},
+      {f:"What is conditioning and what are the two SP 800-90B health tests?",b:"Conditioning = deskewing. Uses hash functions or block ciphers to remove bias from TRNG output and increase entropy.\nRepetition Count Test: detects 'stuck' noise source (consecutive identical samples).\nAdaptive Proportion Test: detects large entropy loss (a sample value occurring too frequently)."},
+      {f:"NIST SP 800-22: how many tests and what three characteristics?",b:"15 separate tests of randomness.\nThree characteristics to establish:\n1. UNIFORMITY — distribution of values\n2. SCALABILITY — results hold at different sample sizes\n3. CONSISTENCY — results reproducible across seeds"},
+    ],
+    l7:[
+      {f:"What two problems did public-key crypto solve?",b:"1. KEY DISTRIBUTION — secure communication without trusting a KDC.\n2. DIGITAL SIGNATURES — verify message comes intact from claimed sender.\nBreakthrough: Diffie & Hellman, Stanford, 1976."},
+      {f:"RSA: encryption and decryption formulas.",b:"Encrypt: C = M^e mod n\nDecrypt: M = C^d mod n\nPublic key: PU = {e, n}\nPrivate key: PR = {d, n}\nDeveloped 1977, MIT, by Rivest, Shamir, Adleman."},
+      {f:"RSA key generation steps.",b:"1. Select primes p, q (p ≠ q)\n2. n = p × q\n3. ø(n) = (p−1)(q−1)\n4. Choose e: 1 < e < ø(n), gcd(ø(n),e) = 1\n5. d ≡ e⁻¹ mod ø(n)\nPU = {e,n}, PR = {d,n}"},
+      {f:"RSA worked example: p=11, q=17.",b:"n = 187, ø(n) = 160\ne = 7 (gcd(160,7) = 1 ✓)\nd = 23 (7×23 = 161 ≡ 1 mod 160)\nPU = {7,187}, PR = {23,187}\n88^7 mod 187 = 11 → 11^23 mod 187 = 88 ✓"},
+      {f:"Three misconceptions about public-key encryption.",b:"1. 'More secure than symmetric' → FALSE\n2. 'Made symmetric obsolete' → FALSE (too slow for general use)\n3. 'Key distribution is trivial' → FALSE (PKI still needed)"},
+      {f:"Table 9.3: which algorithms support which applications?",b:"RSA: Enc ✓ Sig ✓ Exchange ✓\nElliptic Curve: Enc ✓ Sig ✓ Exchange ✓\nDiffie-Hellman: Enc ✗ Sig ✗ Exchange ✓\nDSS: Enc ✗ Sig ✓ Exchange ✗"},
+      {f:"Five approaches to attacking RSA.",b:"1. BRUTE FORCE — try all private keys\n2. MATHEMATICAL — factor n (equivalent approaches)\n3. TIMING — measure decryption time\n4. HARDWARE FAULT — induce processor faults\n5. CHOSEN CIPHERTEXT — exploit RSA properties; countered by OAEP"},
+      {f:"Three timing attack countermeasures.",b:"1. CONSTANT EXPONENTIATION TIME — simple but degrades performance\n2. RANDOM DELAY — add random delay to confuse timing\n3. BLINDING — multiply ciphertext by random number before exponentiation; prevents bit-by-bit analysis"},
+      {f:"What is a trap-door one-way function?",b:"One-way: Y = f(X) easy, X = f⁻¹(Y) infeasible.\nTrap-door: Y = f_k(X) easy with k; X = f_k⁻¹(Y) easy with k; but infeasible without k.\nThe private key is the 'trap door.' RSA's trap door: knowing p,q makes modular exponentiation invertible."},
+      {f:"Why is e = 65537 preferred? What does CRT do for decryption?",b:"65537 = 2^16 + 1 → only TWO 1-bits in binary → minimizes multiplications in square-and-multiply.\ne=3 and e=17 also popular but e=3 is vulnerable.\nCRT: precalculates d mod (p−1) and d mod (q−1) → decryption is ~4× FASTER than direct C^d mod n."},
+    ],
   };
-  const fcIdx = {l1:0, l2:0, l3:0, l4:0, l5:0};
+  const fcIdx = {l1:0, l2:0, l3:0, l4:0, l5:0, l6:0, l7:0};
 
   function renderFC(lec){
     const cards = flashcards[lec]; if(!cards) return;
@@ -501,6 +529,6 @@
   document.getElementById('lec1').classList.add('active');
   buildSecTabs();
   showSec('summary');
-  ['l1','l2','l3','l4','l5'].forEach(lec=>renderFC(lec));
+  ['l1','l2','l3','l4','l5','l6','l7'].forEach(lec=>renderFC(lec));
   // Run tools with defaults
   setTimeout(()=>{runGCD();calcMod();caesarRun('enc');runFreq();runVig();runFeistel();calcKeySearch();runAvalanche();calcGFp();calcPolyXOR();checkAxioms();},100);

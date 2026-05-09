@@ -24,6 +24,8 @@
     <button class="lec-btn" onclick="showLec(3,this)">L3 — Classical Ciphers</button>
     <button class="lec-btn" onclick="showLec(4,this)">L4 — Block Ciphers &amp; DES</button>
     <button class="lec-btn" onclick="showLec(5,this)">L5 — Finite Fields</button>
+    <button class="lec-btn" onclick="showLec(6,this)">L6 — RNG &amp; Stream Ciphers</button>
+    <button class="lec-btn" onclick="showLec(7,this)">L7 — Public Key &amp; RSA</button>
   </div>
   <div id="header-right">
     <span class="hdr-tag">Stallings 8e · Ain Shams</span>
@@ -1423,6 +1425,451 @@
         </div>
       </div>
     </div><!-- /lec5 -->
+
+    <!-- ═══════════════════════════════════
+         LECTURE 6 — Random Bit Generation & Stream Ciphers (Ch.8)
+    ═══════════════════════════════════ -->
+    <div class="lec-panel" id="lec6">
+
+      <!-- L6 SUMMARY -->
+      <div class="sec-panel" id="lec6-summary">
+        <div class="lec-hero">
+          <div class="lec-hero-num">06</div>
+          <div class="lec-hero-info">
+            <h2>Random Bit Generation &amp; Stream Ciphers</h2>
+            <p>TRNG vs PRNG · Randomness &amp; Unpredictability · Linear Congruential Generator · BBS · RC4 · LFSR · Grain-128a · Entropy Sources</p>
+          </div>
+        </div>
+
+        <p class="sec-title">6.1 — Random Number Requirements</p>
+        <div class="card">
+          <p style="font-size:13.5px">Cryptographic protocols rely on random binary numbers for key distribution, session key generation, RSA key generation, and stream cipher keystreams. Two distinct requirements must be met:</p>
+          <div class="grid2" style="margin-top:12px">
+            <div style="background:var(--c-blue-l);border:1px solid var(--c-blue-m);border-radius:var(--r);padding:14px">
+              <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--c-cyan);margin-bottom:6px">Randomness</div>
+              <p style="font-size:13px;color:var(--ink2)">Two criteria validate randomness:<br><strong>Uniform distribution</strong> — frequency of 1s and 0s should be approximately equal.<br><strong>Independence</strong> — no subsequence can be inferred from others.</p>
+            </div>
+            <div style="background:var(--c-violet-l);border:1px solid var(--c-violet-m);border-radius:var(--r);padding:14px">
+              <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--c-violet);margin-bottom:6px">Unpredictability</div>
+              <p style="font-size:13px;color:var(--ink2)"><strong>Forward unpredictability</strong> — next bit cannot be predicted from previous bits if seed is unknown.<br><strong>Backward unpredictability</strong> — seed cannot be determined from generated values.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="sec-title">6.2 — TRNG vs PRNG vs PRF</p>
+        <div class="grid3">
+          <div class="card" style="border-top:3px solid var(--c-coral)">
+            <div class="card-title" style="color:var(--c-coral)">TRNG</div>
+            <p style="font-size:13px">True Random Number Generator. Uses a nondeterministic <strong>entropy source</strong> from the physical environment (keystroke timing, disk activity, mouse movements, system clock). Output is <strong>nondeterministic</strong> and <strong>aperiodic</strong>. Generally inefficient.</p>
+          </div>
+          <div class="card" style="border-top:3px solid var(--c-blue)">
+            <div class="card-title" style="color:var(--c-blue)">PRNG</div>
+            <p style="font-size:13px">Pseudorandom Number Generator. Takes a <strong>seed</strong> (often from a TRNG) and produces a bit stream using a <strong>deterministic algorithm</strong>. Output is <strong>deterministic</strong> and <strong>periodic</strong>. Very efficient. Used for stream cipher keystreams.</p>
+          </div>
+          <div class="card" style="border-top:3px solid var(--c-violet)">
+            <div class="card-title" style="color:var(--c-violet)">PRF</div>
+            <p style="font-size:13px">Pseudorandom Function. Produces a pseudorandom string of <strong>fixed length</strong>. Same as PRNG except for the number of bits produced. Used for symmetric encryption keys and nonces.</p>
+          </div>
+        </div>
+        <div class="card" style="margin-top:4px">
+          <div class="card-title">PRNG vs TRNG Comparison (Table 8.5)</div>
+          <table class="dt">
+            <thead><tr><th>Property</th><th>PRNG</th><th>TRNG</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Efficiency</strong></td><td>Very efficient</td><td>Generally inefficient</td></tr>
+              <tr><td><strong>Determinism</strong></td><td>Deterministic</td><td>Nondeterministic</td></tr>
+              <tr><td><strong>Periodicity</strong></td><td>Periodic</td><td>Aperiodic</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="sec-title">6.3 — PRNG Requirements &amp; Randomness Tests</p>
+        <div class="card">
+          <p style="font-size:13.5px">NIST SP 800-22 specifies 15 tests of randomness. Three characteristics to establish: <strong>uniformity, scalability, consistency</strong>. Key tests include:</p>
+          <div class="step-list" style="margin-top:10px">
+            <div class="step"><div class="step-num" style="background:var(--c-blue-l);color:var(--c-blue)">1</div><div class="step-body"><strong>Frequency test</strong><span>Most basic test — determines if the count of 1s and 0s is approximately equal (as expected for a truly random sequence).</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-blue-l);color:var(--c-blue)">2</div><div class="step-body"><strong>Runs test</strong><span>Checks the total number of <em>runs</em> (uninterrupted sequences of identical bits). Determines if the number of runs of various lengths matches expectations.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-blue-l);color:var(--c-blue)">3</div><div class="step-body"><strong>Maurer's universal statistical test</strong><span>Measures bits between matching patterns. Detects whether the sequence can be significantly compressed — a compressible sequence is non-random.</span></div></div>
+          </div>
+          <div class="callout callout-gold" style="margin-top:10px">⚠ The seed must be secure and unpredictable — typically generated by a TRNG. An adversary who knows the algorithm AND the seed can reproduce the entire bit stream.</div>
+        </div>
+
+        <p class="sec-title">6.4 — Linear Congruential Generator (LCG)</p>
+        <div class="card">
+          <p style="font-size:13.5px">Proposed by Lehmer. Parameterized with four numbers:</p>
+          <div class="formula formula-blue">X_{n+1} = (a × X_n + c) mod m
+
+m = modulus (m > 0)
+a = multiplier (0 < a < m)
+c = increment (0 ≤ c < m)
+X₀ = seed (0 ≤ X₀ < m)</div>
+          <div class="callout callout-coral" style="margin-top:10px">⚠ Not cryptographically secure — if an attacker can observe a few outputs, they can determine the parameters and predict all future values.</div>
+        </div>
+
+        <p class="sec-title">6.5 — Blum Blum Shub (BBS) Generator</p>
+        <div class="card">
+          <p style="font-size:13.5px">Has the <strong>strongest public proof of cryptographic strength</strong> of any purpose-built algorithm. Called a <em>cryptographically secure pseudorandom bit generator</em> (CSPRBG).</p>
+          <div class="formula formula-violet">Choose primes p, q (both ≡ 3 mod 4)
+n = p × q
+Choose seed s coprime to n
+X₀ = s² mod n
+
+For each iteration:
+  X_{i+1} = X_i² mod n
+  B_i = least significant bit of X_{i+1}</div>
+          <p style="font-size:13px;margin-top:8px;color:var(--ink3)">Security based on the difficulty of <strong>factoring n</strong>. Passes the next-bit test: no polynomial-time algorithm can predict the (k+1)st bit from the first k bits with probability significantly greater than 1/2.</p>
+        </div>
+
+        <p class="sec-title">6.6 — PRNG Using Block Cipher Modes</p>
+        <div class="grid2">
+          <div class="card" style="border-left:3px solid var(--c-cyan)">
+            <div class="card-title" style="color:var(--c-cyan)">CTR Mode</div>
+            <p style="font-size:13px">Counter incremented each iteration, encrypted with key K. Output = encrypted counter values. Recommended in NIST SP 800-90, ANSI X.82, and RFC 4086.</p>
+          </div>
+          <div class="card" style="border-left:3px solid var(--c-gold)">
+            <div class="card-title" style="color:var(--c-gold)">OFB Mode</div>
+            <p style="font-size:13px">Output of encryption fed back as next input (no counter). Recommended in X9.82 and RFC 4086.</p>
+          </div>
+        </div>
+
+        <p class="sec-title">6.7 — Stream Cipher Design &amp; RC4</p>
+        <div class="card">
+          <div class="card-title">Stream Cipher Design Considerations</div>
+          <div class="step-list" style="margin-top:8px">
+            <div class="step"><div class="step-num" style="background:var(--c-violet-l);color:var(--c-violet)">1</div><div class="step-body"><strong>Large period</strong><span>The longer the period of repeat, the harder to do cryptanalysis.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-violet-l);color:var(--c-violet)">2</div><div class="step-body"><strong>Approximate true random properties</strong><span>Equal numbers of 1s and 0s; all 256 byte values should appear approximately equally often.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-violet-l);color:var(--c-violet)">3</div><div class="step-body"><strong>Key length ≥ 128 bits</strong><span>Same considerations as block ciphers apply.</span></div></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:4px">
+          <div class="card-title">RC4</div>
+          <p style="font-size:13.5px">Designed in <strong>1987 by Ron Rivest</strong> for RSA Security. Variable key size, byte-oriented stream cipher based on a <strong>random permutation</strong> of all 256 possible bytes.</p>
+          <div class="grid2" style="margin-top:12px">
+            <div style="background:var(--c-green-l);border:1px solid var(--c-green-m);border-radius:var(--r);padding:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--c-green);margin-bottom:4px">Strengths</div>
+              <p style="font-size:12.5px;color:var(--ink2)">Very fast in software (8–16 machine operations per output byte). Used in WPA (IEEE 802.11), optional in SSH and Kerberos.</p>
+            </div>
+            <div style="background:var(--c-coral-l);border:1px solid var(--c-coral-m);border-radius:var(--r);padding:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--c-coral);margin-bottom:4px">Weaknesses &amp; Status</div>
+              <p style="font-size:12.5px;color:var(--ink2)">Key scheduling vulnerability discovered. Keystream biases exploited to recover plaintexts. <strong>RFC 7465 prohibits RC4 in TLS.</strong> NIST also prohibits it for government use.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="sec-title">6.8 — Feedback Shift Registers (LFSR &amp; NFSR)</p>
+        <div class="card">
+          <p style="font-size:13.5px">An FSR consists of a sequence of 1-bit memory cells. At each clock cycle: the rightmost bit is shifted out as output, other bits shift right, and the new leftmost bit is computed as a function of the other bits.</p>
+          <div class="grid2" style="margin-top:12px">
+            <div style="background:var(--c-cyan-l);border:1px solid var(--c-cyan-m);border-radius:var(--r);padding:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--c-cyan);margin-bottom:4px">LFSR (Linear)</div>
+              <p style="font-size:12.5px;color:var(--ink2)">Feedback function is XOR of selected bits. Guarantees <strong>minimum period</strong> for keystream. Provides balancedness. Well-developed theory exists.</p>
+            </div>
+            <div style="background:var(--c-violet-l);border:1px solid var(--c-violet-m);border-radius:var(--r);padding:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--c-violet);margin-bottom:4px">NFSR (Nonlinear)</div>
+              <p style="font-size:12.5px;color:var(--ink2)">Uses nonlinear Boolean functions (AND gates in addition to XOR). Introduces <strong>nonlinearity</strong> essential for cryptographic security.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="sec-title">6.9 — Grain-128a</p>
+        <div class="card">
+          <p style="font-size:13.5px">A hardware-efficient stream cipher from the eSTREAM project. Uses <strong>128-bit key</strong> and <strong>96-bit IV</strong>. Consists of two 128-bit shift registers (one LFSR + one NFSR) coupled by Boolean functions, plus a nonlinear filter function.</p>
+          <div class="callout callout-cyan">The LFSR guarantees minimum period and balancedness; the NFSR introduces nonlinearity. The NFSR input is masked with the LFSR output to keep the NFSR state balanced.</div>
+        </div>
+
+        <p class="sec-title">6.10 — Entropy Sources &amp; Conditioning</p>
+        <div class="card">
+          <p style="font-size:13.5px">Entropy sources for TRNGs include: sound/video input (thermal noise), disk drive rotational speed fluctuations (chaotic air turbulence), and Intel's on-chip thermal noise sampler.</p>
+          <div class="card-title" style="margin-top:12px">Conditioning (Deskewing)</div>
+          <p style="font-size:13px;color:var(--ink2)">Raw TRNG output may be biased. <strong>Conditioning algorithms</strong> use cryptographic operations (hash functions or symmetric block ciphers) to scramble the bits, eliminate bias, and increase entropy. NIST SP 800-90B defines entropy rate as a value between 0 (no entropy) and 1 (full entropy).</p>
+          <div class="callout callout-gold" style="margin-top:10px">SP 800-90B mandates two health tests on noise sources: <strong>Repetition Count Test</strong> (detects "stuck" source) and <strong>Adaptive Proportion Test</strong> (detects large entropy loss).</div>
+        </div>
+      </div>
+
+      <!-- L6 FLASHCARDS -->
+      <div class="sec-panel" id="lec6-flashcards">
+        <div class="lec-hero"><div class="lec-hero-num">06</div><div class="lec-hero-info"><h2>Flashcards · Lecture 6</h2><p>TRNG, PRNG, RC4, BBS, LFSR, entropy</p></div></div>
+        <div class="prog-wrap"><div class="prog-label" id="l6fc-lbl">Card 1 of 10</div><div class="prog-track"><div class="prog-fill" id="l6fc-bar" style="width:10%"></div></div></div>
+        <div class="fc-scene-wrap" onclick="fcFlip('l6')"><div class="fc-scene" id="l6-fc-scene"><div class="fc-face fc-front"><div class="fc-lbl">Term — click to flip</div><div class="fc-term" id="l6-fc-front">…</div></div><div class="fc-face fc-back"><div class="fc-lbl">Answer</div><div class="fc-term" id="l6-fc-back">…</div></div></div></div>
+        <p class="fc-hint">Click card to flip · Use buttons to navigate</p>
+        <div class="fc-nav"><button class="fc-btn" onclick="fcPrev('l6')">← Prev</button><span class="fc-count" id="l6-fc-count">1/10</span><button class="fc-btn" onclick="fcNext('l6')">Next →</button></div>
+      </div>
+
+      <!-- L6 QUIZ -->
+      <div class="sec-panel" id="lec6-quiz">
+        <div class="lec-hero"><div class="lec-hero-num">06</div><div class="lec-hero-info"><h2>Practice Questions · Lecture 6</h2><p>10 questions · Easy → Hard · Click to reveal</p></div></div>
+        <div class="prog-wrap"><div class="prog-label" id="l6q-lbl">0 of 10 revealed</div><div class="prog-track"><div class="prog-fill" id="l6q-bar" style="width:0%"></div></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">Definitions</span></div><div class="q-text">What are the two distinct requirements for a sequence of random numbers in cryptographic applications?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p><strong>Randomness:</strong> The sequence must satisfy uniform distribution (equal 1s and 0s) and independence (no subsequence inferable from others).<br><strong>Unpredictability:</strong> Successive members must be unpredictable — both forward (can't predict next bit) and backward (can't determine seed from output).</p></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">TRNG vs PRNG</span></div><div class="q-text">Compare TRNG and PRNG across three properties: efficiency, determinism, and periodicity.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p><strong>TRNG:</strong> Generally inefficient, nondeterministic, aperiodic.<br><strong>PRNG:</strong> Very efficient, deterministic, periodic.<br>PRNGs use a seed and a deterministic algorithm; TRNGs use physical entropy sources.</p></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">LCG</span></div><div class="q-text">State the Linear Congruential Generator formula and its four parameters.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>X_{n+1} = (a × X_n + c) mod m<br><strong>m</strong> = modulus (m > 0)<br><strong>a</strong> = multiplier (0 < a < m)<br><strong>c</strong> = increment (0 ≤ c < m)<br><strong>X₀</strong> = seed (0 ≤ X₀ < m)<br>Selection of a, c, m is critical for quality.</p></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">BBS</span></div><div class="q-text">What is the BBS generator and why is it considered cryptographically secure?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>Blum Blum Shub: X_{i+1} = X_i² mod n, output = least significant bit of X_{i+1}. n = p×q where p, q are primes ≡ 3 mod 4.<br>It passes the <strong>next-bit test</strong> — no polynomial-time algorithm can predict bit (k+1) from the first k bits with probability significantly greater than 1/2. Security is based on the difficulty of <strong>factoring n</strong>.</p></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">RC4</span></div><div class="q-text">Who designed RC4, and why has it been deprecated?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>Designed by <strong>Ron Rivest in 1987</strong> for RSA Security. Deprecated because a fundamental vulnerability in the key scheduling algorithm was discovered, and keystream biases allow recovering repeatedly encrypted plaintexts. <strong>RFC 7465 prohibits RC4 in TLS.</strong> NIST also prohibits it for government use.</p></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-med">Medium</span><span class="badge badge-topic">Tests</span></div><div class="q-text">Describe the three randomness tests from NIST SP 800-22 covered in the slides.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p><strong>Frequency test:</strong> Checks if count of 1s and 0s is approximately equal. Most basic test.<br><strong>Runs test:</strong> Checks total number of runs (consecutive identical bits). Determines if runs of various lengths match random expectations.<br><strong>Maurer's universal test:</strong> Measures bits between matching patterns. Tests if the sequence can be significantly compressed — compressible = non-random.</p></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-med">Medium</span><span class="badge badge-topic">Stream Ciphers</span></div><div class="q-text">List three key design considerations for stream ciphers.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>1. <strong>Large period</strong> — the longer before the keystream repeats, the harder to cryptanalyze.<br>2. <strong>Approximate true randomness</strong> — equal 1s/0s, all 256 byte values approximately equally frequent.<br>3. <strong>Key length ≥ 128 bits</strong> — same considerations as block ciphers apply. With a properly designed PRNG, a stream cipher can be as secure as a block cipher of comparable key length.</p></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-med">Medium</span><span class="badge badge-topic">LFSR</span></div><div class="q-text">What is a feedback shift register? What is the difference between LFSR and NFSR?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>An FSR is a sequence of 1-bit memory cells. Each clock cycle: rightmost bit is output, bits shift right, new leftmost bit is computed from other bits.<br><strong>LFSR:</strong> feedback = XOR of selected bits (linear). Guarantees minimum period, provides balance, well-understood theory.<br><strong>NFSR:</strong> feedback uses nonlinear functions (AND + XOR). Introduces nonlinearity needed for cryptographic security. Grain-128a uses both together.</p></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-hard">Hard</span><span class="badge badge-topic">Conditioning</span></div><div class="q-text">What is conditioning in the context of TRNGs? What are the two health tests mandated by SP 800-90B?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p><strong>Conditioning</strong> (deskewing) uses cryptographic algorithms (hash functions or block ciphers) to remove bias from raw TRNG output and increase entropy to near 1.<br><strong>Repetition Count Test:</strong> Detects catastrophic failure where the noise source becomes "stuck" on a single value — looks for consecutive identical samples.<br><strong>Adaptive Proportion Test:</strong> Detects large entropy loss — continuously measures local frequency of a sample value to check if it occurs too frequently.</p></div></div>
+        <div class="q-card" data-key="l6q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-hard">Hard</span><span class="badge badge-topic">Grain-128a</span></div><div class="q-text">Describe the structure of Grain-128a and explain the role of each component.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>Grain-128a has three main components:<br><strong>LFSR (128-bit):</strong> Guarantees minimum period for the keystream and provides balancedness in the output.<br><strong>NFSR (128-bit):</strong> Together with a nonlinear filter, introduces nonlinearity to the cipher. Its input is masked (XORed) with the LFSR output to keep the NFSR state balanced.<br><strong>Filter function h:</strong> A nonlinear Boolean function that combines selected bits from both registers to produce the keystream bit.<br>The registers are coupled by lightweight but carefully chosen Boolean functions. The 128-bit key loads into the NFSR and the 96-bit IV loads into the LFSR.</p></div></div>
+      </div>
+
+      <!-- L6 KEY FACTS -->
+      <div class="sec-panel" id="lec6-keyfacts">
+        <div class="lec-hero"><div class="lec-hero-num">06</div><div class="lec-hero-info"><h2>Key Facts · Lecture 6</h2></div></div>
+        <input class="fs-search" type="text" placeholder="🔍 Search facts…" oninput="filterFS(this)">
+        <div class="fs-group">
+          <div class="fs-group-lbl">Random Number Fundamentals</div>
+          <div class="fs-row" data-s="randomness uniform distribution independence"><div class="fs-name">Randomness criteria</div><div class="fs-desc">Two criteria</div><div class="fs-val" style="border-color:var(--c-blue);background:var(--c-blue-l);color:var(--c-blue)">Uniform distribution + Independence</div></div>
+          <div class="fs-row" data-s="unpredictability forward backward seed"><div class="fs-name">Unpredictability</div><div class="fs-desc">Two forms</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">Forward + Backward</div></div>
+          <div class="fs-row" data-s="TRNG nondeterministic aperiodic inefficient"><div class="fs-name">TRNG properties</div><div class="fs-desc">Three key traits</div><div class="fs-val" style="border-color:var(--c-coral);background:var(--c-coral-l);color:var(--c-coral)">Nondeterministic · Aperiodic · Inefficient</div></div>
+          <div class="fs-row" data-s="PRNG deterministic periodic efficient seed"><div class="fs-name">PRNG properties</div><div class="fs-desc">Three key traits</div><div class="fs-val" style="border-color:var(--c-blue);background:var(--c-blue-l);color:var(--c-blue)">Deterministic · Periodic · Efficient</div></div>
+          <div class="fs-row" data-s="NIST SP 800-22 randomness tests 15"><div class="fs-name">NIST SP 800-22</div><div class="fs-desc">Number of tests</div><div class="fs-val" style="border-color:var(--c-gold);background:var(--c-gold-l);color:var(--c-gold)">15 separate randomness tests</div></div>
+        </div>
+        <div class="fs-group">
+          <div class="fs-group-lbl">Algorithms</div>
+          <div class="fs-row" data-s="LCG linear congruential generator Lehmer formula"><div class="fs-name">LCG formula</div><div class="fs-desc">Lehmer's algorithm</div><div class="fs-val" style="border-color:var(--c-cyan);background:var(--c-cyan-l);color:var(--c-cyan)">X_{n+1} = (aX_n + c) mod m</div></div>
+          <div class="fs-row" data-s="BBS Blum Blum Shub CSPRBG factoring next-bit"><div class="fs-name">BBS security basis</div><div class="fs-desc">Why it's secure</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">Difficulty of factoring n = p×q</div></div>
+          <div class="fs-row" data-s="RC4 Ron Rivest 1987 byte-oriented permutation"><div class="fs-name">RC4 designer/year</div><div class="fs-desc">Historical fact</div><div class="fs-val" style="border-color:var(--c-gold);background:var(--c-gold-l);color:var(--c-gold)">Ron Rivest, 1987</div></div>
+          <div class="fs-row" data-s="RC4 deprecated TLS RFC 7465 prohibited"><div class="fs-name">RC4 status</div><div class="fs-desc">Current security status</div><div class="fs-val" style="border-color:var(--c-coral);background:var(--c-coral-l);color:var(--c-coral)">Prohibited in TLS (RFC 7465)</div></div>
+          <div class="fs-row" data-s="CTR OFB block cipher PRNG modes"><div class="fs-name">Block cipher PRNG modes</div><div class="fs-desc">Two approaches</div><div class="fs-val" style="border-color:var(--c-cyan);background:var(--c-cyan-l);color:var(--c-cyan)">CTR mode + OFB mode</div></div>
+        </div>
+        <div class="fs-group">
+          <div class="fs-group-lbl">FSR &amp; Entropy</div>
+          <div class="fs-row" data-s="LFSR linear feedback XOR period balance"><div class="fs-name">LFSR purpose</div><div class="fs-desc">What it provides</div><div class="fs-val" style="border-color:var(--c-cyan);background:var(--c-cyan-l);color:var(--c-cyan)">Minimum period + Balancedness</div></div>
+          <div class="fs-row" data-s="NFSR nonlinear AND security confusion"><div class="fs-name">NFSR purpose</div><div class="fs-desc">What it adds</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">Nonlinearity for crypto security</div></div>
+          <div class="fs-row" data-s="conditioning deskewing hash block cipher bias entropy"><div class="fs-name">Conditioning</div><div class="fs-desc">Purpose</div><div class="fs-val" style="border-color:var(--c-gold);background:var(--c-gold-l);color:var(--c-gold)">Remove bias, increase entropy</div></div>
+          <div class="fs-row" data-s="SP 800-90B health tests repetition count adaptive proportion"><div class="fs-name">SP 800-90B health tests</div><div class="fs-desc">Two mandated tests</div><div class="fs-val" style="border-color:var(--c-green);background:var(--c-green-l);color:var(--c-green)">Repetition Count + Adaptive Proportion</div></div>
+        </div>
+      </div>
+    </div><!-- /lec6 -->
+
+    <!-- ═══════════════════════════════════
+         LECTURE 7 — Public Key Cryptography & RSA (Ch.9)
+    ═══════════════════════════════════ -->
+    <div class="lec-panel" id="lec7">
+
+      <!-- L7 SUMMARY -->
+      <div class="sec-panel" id="lec7-summary">
+        <div class="lec-hero">
+          <div class="lec-hero-num">07</div>
+          <div class="lec-hero-info">
+            <h2>Public Key Cryptography &amp; RSA</h2>
+            <p>Asymmetric Encryption · Diffie-Hellman · RSA Algorithm · Key Generation · Modular Exponentiation · Attacks · OAEP</p>
+          </div>
+        </div>
+
+        <p class="sec-title">7.1 — Principles of Public-Key Cryptosystems</p>
+        <div class="card">
+          <p style="font-size:13.5px">Public-key cryptography evolved to solve two problems of symmetric encryption:</p>
+          <div class="grid2" style="margin-top:12px">
+            <div style="background:var(--c-blue-l);border:1px solid var(--c-blue-m);border-radius:var(--r);padding:14px">
+              <div style="font-size:12px;font-weight:700;color:var(--c-cyan);margin-bottom:6px">Key Distribution</div>
+              <p style="font-size:13px;color:var(--ink2)">How to communicate securely without trusting a KDC with your key.</p>
+            </div>
+            <div style="background:var(--c-violet-l);border:1px solid var(--c-violet-m);border-radius:var(--r);padding:14px">
+              <div style="font-size:12px;font-weight:700;color:var(--c-violet);margin-bottom:6px">Digital Signatures</div>
+              <p style="font-size:13px;color:var(--ink2)">How to verify that a message comes intact from the claimed sender.</p>
+            </div>
+          </div>
+          <div class="callout callout-blue" style="margin-top:12px"><strong>Diffie &amp; Hellman (1976)</strong> from Stanford achieved the breakthrough — addressing both problems with a radically different approach.</div>
+        </div>
+
+        <div class="card" style="margin-top:4px">
+          <div class="card-title">Six Ingredients of a Public-Key Encryption Scheme</div>
+          <table class="dt" style="margin-top:8px">
+            <thead><tr><th>Ingredient</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Plaintext</strong></td><td>The readable message fed into the algorithm as input</td></tr>
+              <tr><td><strong>Encryption algorithm</strong></td><td>Performs various transformations on the plaintext</td></tr>
+              <tr><td><strong>Public key</strong></td><td>Used for encryption or decryption (made public)</td></tr>
+              <tr><td><strong>Private key</strong></td><td>Used for encryption or decryption (kept secret)</td></tr>
+              <tr><td><strong>Ciphertext</strong></td><td>The scrambled message produced as output</td></tr>
+              <tr><td><strong>Decryption algorithm</strong></td><td>Accepts ciphertext + matching key → original plaintext</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="sec-title">7.2 — Misconceptions About Public-Key Encryption</p>
+        <div class="card">
+          <div class="step-list">
+            <div class="step"><div class="step-num" style="background:var(--c-coral-l);color:var(--c-coral)">✗</div><div class="step-body"><strong>"Public-key is more secure than symmetric"</strong><span>FALSE — security depends on key length and algorithm, not on the type of scheme.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-coral-l);color:var(--c-coral)">✗</div><div class="step-body"><strong>"Public-key has made symmetric obsolete"</strong><span>FALSE — public-key is too slow for general-purpose use; currently confined to key management and signatures.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-coral-l);color:var(--c-coral)">✗</div><div class="step-body"><strong>"Key distribution is trivial with public-key"</strong><span>FALSE — PKI requires certificates, CAs, and infrastructure for secure key distribution.</span></div></div>
+          </div>
+        </div>
+
+        <p class="sec-title">7.3 — Conventional vs Public-Key Encryption (Table 9.2)</p>
+        <div class="card">
+          <table class="dt">
+            <thead><tr><th>Aspect</th><th>Conventional (Symmetric)</th><th>Public-Key (Asymmetric)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Keys</strong></td><td>Same key for encryption and decryption</td><td>Pair of keys: one encrypts, other decrypts</td></tr>
+              <tr><td><strong>Sharing</strong></td><td>Sender and receiver share the algorithm and key</td><td>Each has one of the matched pair (not the same)</td></tr>
+              <tr><td><strong>Secrecy</strong></td><td>The key must be kept secret</td><td>One of the two keys must be kept secret</td></tr>
+              <tr><td><strong>Infeasibility</strong></td><td>Must be impractical to decipher without the key</td><td>Must be impractical even knowing one key, the algorithm, and ciphertext samples to determine the other key</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="sec-title">7.4 — Applications &amp; Algorithm Capabilities (Table 9.3)</p>
+        <div class="card">
+          <table class="dt">
+            <thead><tr><th>Algorithm</th><th>Encryption/Decryption</th><th>Digital Signature</th><th>Key Exchange</th></tr></thead>
+            <tbody>
+              <tr><td><strong>RSA</strong></td><td style="color:var(--c-green)">Yes</td><td style="color:var(--c-green)">Yes</td><td style="color:var(--c-green)">Yes</td></tr>
+              <tr><td><strong>Elliptic Curve</strong></td><td style="color:var(--c-green)">Yes</td><td style="color:var(--c-green)">Yes</td><td style="color:var(--c-green)">Yes</td></tr>
+              <tr><td><strong>Diffie-Hellman</strong></td><td style="color:var(--c-coral)">No</td><td style="color:var(--c-coral)">No</td><td style="color:var(--c-green)">Yes</td></tr>
+              <tr><td><strong>DSS</strong></td><td style="color:var(--c-coral)">No</td><td style="color:var(--c-green)">Yes</td><td style="color:var(--c-coral)">No</td></tr>
+            </tbody>
+          </table>
+          <div class="callout callout-blue" style="margin-top:10px">RSA and Elliptic Curve are the only algorithms suitable for all three applications. Diffie-Hellman is key exchange only. DSS is digital signature only.</div>
+        </div>
+
+        <p class="sec-title">7.5 — Public-Key Requirements &amp; Trap-Door One-Way Functions</p>
+        <div class="card">
+          <div class="card-title">Six Requirements</div>
+          <div class="step-list" style="margin-top:8px">
+            <div class="step"><div class="step-num" style="background:var(--c-blue-l);color:var(--c-blue)">1</div><div class="step-body"><strong>Easy to generate key pair</strong><span>(PU_b, PR_b) — computationally easy.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-blue-l);color:var(--c-blue)">2</div><div class="step-body"><strong>Easy to encrypt</strong><span>Sender can generate ciphertext from public key + message.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-blue-l);color:var(--c-blue)">3</div><div class="step-body"><strong>Easy to decrypt</strong><span>Receiver can recover plaintext using private key.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-coral-l);color:var(--c-coral)">4</div><div class="step-body"><strong>Infeasible to find private key</strong><span>From the public key alone.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-coral-l);color:var(--c-coral)">5</div><div class="step-body"><strong>Infeasible to recover plaintext</strong><span>From public key + ciphertext.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-violet-l);color:var(--c-violet)">6</div><div class="step-body"><strong>Keys can be applied in either order</strong><span>D(PU, E(PR, M)) = M and vice versa.</span></div></div>
+          </div>
+          <div class="callout callout-violet" style="margin-top:10px"><strong>Trap-door one-way function:</strong> Y = f_k(X) is easy if k and X are known; X = f_k⁻¹(Y) is easy if k and Y are known; but X = f_k⁻¹(Y) is infeasible if Y is known but k is not.</div>
+        </div>
+
+        <p class="sec-title">7.6 — The RSA Algorithm</p>
+        <div class="card">
+          <p style="font-size:13.5px">Developed in <strong>1977 at MIT</strong> by Ron Rivest, Adi Shamir, and Len Adleman. Most widely used general-purpose public-key encryption. Plaintext and ciphertext are integers between 0 and n−1.</p>
+          <div class="card-title" style="margin-top:14px">Key Generation (Figure 9.5)</div>
+          <div class="formula formula-blue">1. Select p, q     → both prime, p ≠ q
+2. Calculate n = p × q
+3. Calculate ø(n) = (p−1)(q−1)
+4. Select e         → 1 < e < ø(n), gcd(ø(n), e) = 1
+5. Calculate d ≡ e⁻¹ (mod ø(n))
+
+Public key:  PU = {e, n}
+Private key: PR = {d, n}</div>
+          <div class="card-title" style="margin-top:14px">Encryption &amp; Decryption</div>
+          <div style="text-align:center;padding:16px;background:rgba(77,127,255,.07);border:1px solid var(--c-blue-m);border-radius:var(--r);margin:10px 0">
+            <span style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--c-cyan)">Encrypt: C = M<sup>e</sup> mod n &nbsp;&nbsp;|&nbsp;&nbsp; Decrypt: M = C<sup>d</sup> mod n</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:4px">
+          <div class="card-title">RSA Worked Example (Figure 9.6)</div>
+          <div class="formula formula-blue">p = 11, q = 17 → n = 187, ø(n) = 160
+e = 7 (gcd(160,7) = 1 ✓)
+d = 23 (7 × 23 = 161 ≡ 1 mod 160 ✓)
+
+PU = {7, 187}    PR = {23, 187}
+
+Encrypt M=88: C = 88⁷ mod 187 = 11
+Decrypt C=11: M = 11²³ mod 187 = 88 ✓</div>
+        </div>
+
+        <p class="sec-title">7.7 — Efficient Exponentiation</p>
+        <div class="card">
+          <p style="font-size:13.5px">RSA requires raising integers to large powers mod n. The <strong>fast modular exponentiation</strong> algorithm (square-and-multiply) makes this efficient.</p>
+          <div class="grid2" style="margin-top:12px">
+            <div style="background:var(--c-cyan-l);border:1px solid var(--c-cyan-m);border-radius:var(--r);padding:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--c-cyan);margin-bottom:4px">Public Key Efficiency</div>
+              <p style="font-size:12.5px;color:var(--ink2)">Common choice: <strong>e = 65537 (2¹⁶+1)</strong>. Has only two 1-bits in binary, minimizing multiplications. Other popular choices: e=3 and e=17. Caution: e=3 makes RSA vulnerable to a simple attack.</p>
+            </div>
+            <div style="background:var(--c-violet-l);border:1px solid var(--c-violet-m);border-radius:var(--r);padding:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--c-violet);margin-bottom:4px">Private Key Efficiency</div>
+              <p style="font-size:12.5px;color:var(--ink2)">Use <strong>Chinese Remainder Theorem (CRT)</strong>: precalculate d mod (p−1) and d mod (q−1). Result: computation is approximately <strong>4× faster</strong> than direct M = Cᵈ mod n.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="sec-title">7.8 — Security of RSA</p>
+        <div class="card">
+          <div class="card-title">Five Attack Approaches</div>
+          <table class="dt" style="margin-top:8px">
+            <thead><tr><th>Attack</th><th>Method</th></tr></thead>
+            <tbody>
+              <tr><td><span class="pill pill-coral">Brute force</span></td><td>Try all possible private keys. Countered by large keys (but slower enc/dec)</td></tr>
+              <tr><td><span class="pill pill-coral">Mathematical</span></td><td>Factor n into p and q, then compute ø(n) and d. All approaches equivalent to factoring.</td></tr>
+              <tr><td><span class="pill pill-gold">Timing</span></td><td>Measure decryption time to deduce private key bits. Ciphertext-only attack from an unexpected direction.</td></tr>
+              <tr><td><span class="pill pill-gold">Hardware fault</span></td><td>Induce faults in signature computation by reducing processor power. Requires physical access.</td></tr>
+              <tr><td><span class="pill pill-violet">Chosen ciphertext</span></td><td>Exploit RSA's mathematical properties. Countered by <strong>OAEP</strong> (Optimal Asymmetric Encryption Padding).</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top:4px">
+          <div class="card-title">Timing Attack Countermeasures</div>
+          <div class="step-list">
+            <div class="step"><div class="step-num" style="background:var(--c-blue-l);color:var(--c-blue)">1</div><div class="step-body"><strong>Constant exponentiation time</strong><span>All exponentiations take the same time. Simple fix but degrades performance.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-blue-l);color:var(--c-blue)">2</div><div class="step-body"><strong>Random delay</strong><span>Add random delay to confuse timing measurements. Better performance than constant time.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-blue-l);color:var(--c-blue)">3</div><div class="step-body"><strong>Blinding</strong><span>Multiply ciphertext by random number before exponentiation. Prevents bit-by-bit analysis.</span></div></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:4px">
+          <div class="card-title">Three Mathematical Attack Approaches</div>
+          <div class="step-list">
+            <div class="step"><div class="step-num" style="background:var(--c-coral-l);color:var(--c-coral)">1</div><div class="step-body"><strong>Factor n</strong><span>Into primes p and q → compute ø(n) = (p−1)(q−1) → compute d = e⁻¹ mod ø(n).</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-coral-l);color:var(--c-coral)">2</div><div class="step-body"><strong>Determine ø(n) directly</strong><span>Without finding p and q first → then compute d.</span></div></div>
+            <div class="step"><div class="step-num" style="background:var(--c-coral-l);color:var(--c-coral)">3</div><div class="step-body"><strong>Determine d directly</strong><span>Without first determining ø(n).</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- L7 FLASHCARDS -->
+      <div class="sec-panel" id="lec7-flashcards">
+        <div class="lec-hero"><div class="lec-hero-num">07</div><div class="lec-hero-info"><h2>Flashcards · Lecture 7</h2><p>Public-key principles, RSA, attacks, PKI</p></div></div>
+        <div class="prog-wrap"><div class="prog-label" id="l7fc-lbl">Card 1 of 10</div><div class="prog-track"><div class="prog-fill" id="l7fc-bar" style="width:10%"></div></div></div>
+        <div class="fc-scene-wrap" onclick="fcFlip('l7')"><div class="fc-scene" id="l7-fc-scene"><div class="fc-face fc-front"><div class="fc-lbl">Term — click to flip</div><div class="fc-term" id="l7-fc-front">…</div></div><div class="fc-face fc-back"><div class="fc-lbl">Answer</div><div class="fc-term" id="l7-fc-back">…</div></div></div></div>
+        <p class="fc-hint">Click card to flip · Use buttons to navigate</p>
+        <div class="fc-nav"><button class="fc-btn" onclick="fcPrev('l7')">← Prev</button><span class="fc-count" id="l7-fc-count">1/10</span><button class="fc-btn" onclick="fcNext('l7')">Next →</button></div>
+      </div>
+
+      <!-- L7 QUIZ -->
+      <div class="sec-panel" id="lec7-quiz">
+        <div class="lec-hero"><div class="lec-hero-num">07</div><div class="lec-hero-info"><h2>Practice Questions · Lecture 7</h2><p>10 questions · Easy → Hard · Click to reveal</p></div></div>
+        <div class="prog-wrap"><div class="prog-label" id="l7q-lbl">0 of 10 revealed</div><div class="prog-track"><div class="prog-fill" id="l7q-bar" style="width:0%"></div></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">Principles</span></div><div class="q-text">What two problems of symmetric encryption did public-key cryptography evolve to solve?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>1. <strong>Key distribution</strong> — how to communicate securely without trusting a KDC with your key.<br>2. <strong>Digital signatures</strong> — how to verify that a message comes intact from the claimed sender.<br>Diffie and Hellman from Stanford achieved the breakthrough in 1976.</p></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">RSA</span></div><div class="q-text">State the RSA encryption and decryption formulas. What are the public and private keys?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>Encrypt: <strong>C = Mᵉ mod n</strong><br>Decrypt: <strong>M = Cᵈ mod n</strong><br>Public key: PU = {e, n}<br>Private key: PR = {d, n}<br>Both sender and receiver know n; sender knows e; only receiver knows d.</p></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">Table 9.3</span></div><div class="q-text">Which public-key algorithm supports all three applications (encryption, digital signature, key exchange)?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p><strong>RSA</strong> and <strong>Elliptic Curve</strong> support all three. Diffie-Hellman supports only key exchange. DSS supports only digital signatures.</p></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">RSA History</span></div><div class="q-text">Who developed RSA, when, and where?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>Developed in <strong>1977 at MIT</strong> by <strong>Ron Rivest, Adi Shamir, and Len Adleman</strong>. It is the most widely used general-purpose approach to public-key encryption. Typical size for n is 1024 bits (309 decimal digits).</p></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-easy">Easy</span><span class="badge badge-topic">Misconceptions</span></div><div class="q-text">Name three common misconceptions about public-key encryption.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>1. "Public-key is more secure from cryptanalysis than symmetric" — FALSE.<br>2. "Public-key has made symmetric encryption obsolete" — FALSE (too slow for general use).<br>3. "Key distribution is trivial with public-key" — FALSE (PKI infrastructure still required).</p></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-med">Medium</span><span class="badge badge-topic">RSA Key Gen</span></div><div class="q-text">Walk through RSA key generation with p=11, q=17. Compute n, ø(n), choose e, find d.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>n = 11 × 17 = <strong>187</strong><br>ø(n) = (11−1)(17−1) = 10 × 16 = <strong>160</strong><br>Choose e = 7 (gcd(160, 7) = 1 ✓)<br>Find d: d ≡ 7⁻¹ mod 160 → 7 × 23 = 161 ≡ 1 mod 160 → d = <strong>23</strong><br>PU = {7, 187}, PR = {23, 187}<br>Verify: M=88, C = 88⁷ mod 187 = 11, M = 11²³ mod 187 = 88 ✓</p></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-med">Medium</span><span class="badge badge-topic">Attacks</span></div><div class="q-text">List the five approaches to attacking RSA and briefly describe each.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>1. <strong>Brute force</strong> — try all private keys; countered by large keys.<br>2. <strong>Mathematical</strong> — factor n, or determine ø(n) or d directly; all equivalent to factoring.<br>3. <strong>Timing</strong> — measure decryption time to deduce key bits; countered by constant time, random delay, or blinding.<br>4. <strong>Hardware fault</strong> — induce faults in signature computation; requires physical access.<br>5. <strong>Chosen ciphertext</strong> — exploit RSA's multiplicative property; countered by OAEP padding.</p></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-med">Medium</span><span class="badge badge-topic">Trap-Door</span></div><div class="q-text">What is a trap-door one-way function? How does it relate to public-key cryptography?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>A <strong>one-way function</strong>: Y = f(X) is easy but X = f⁻¹(Y) is infeasible.<br>A <strong>trap-door one-way function</strong>: Y = f_k(X) is easy if k and X are known; X = f_k⁻¹(Y) is easy if k and Y are known; but X = f_k⁻¹(Y) is infeasible if Y is known but k is not.<br>The "trap door" k is the private key. A practical public-key scheme depends on finding a suitable trap-door one-way function — for RSA, this is modular exponentiation with the factoring problem as the trap door.</p></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-hard">Hard</span><span class="badge badge-topic">Efficiency</span></div><div class="q-text">Why is e = 65537 the most common choice for RSA's public exponent? What is CRT used for?</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>65537 = 2¹⁶ + 1, which has only <strong>two 1-bits</strong> in binary (10000000000000001). This minimizes the number of multiplications in the square-and-multiply algorithm. Other choices with few 1-bits (e=3, e=17) are also popular, but e=3 makes RSA vulnerable to a simple attack.<br><br><strong>CRT (Chinese Remainder Theorem)</strong> speeds up decryption by precalculating d mod (p−1) and d mod (q−1), then combining results. This makes decryption approximately <strong>4× faster</strong> than computing M = Cᵈ mod n directly. A small d cannot be used because it's vulnerable to brute-force and other cryptanalytic attacks.</p></div></div>
+        <div class="q-card" data-key="l7q" data-total="10"><div class="q-header" onclick="qClick(this)"><div><div class="q-meta"><span class="badge badge-hard">Hard</span><span class="badge badge-topic">Scenario</span></div><div class="q-text">Explain how a chosen ciphertext attack works against RSA and how OAEP defends against it.</div></div><div class="q-chevron">▾</div></div><div class="q-answer"><p>In a <strong>chosen ciphertext attack</strong>, the adversary chooses ciphertexts and obtains the corresponding plaintexts (decrypted with the target's private key). The adversary exploits RSA's <strong>multiplicative property</strong>: E(M₁) × E(M₂) = E(M₁ × M₂). By choosing specific ciphertext blocks, the adversary extracts information needed for cryptanalysis.<br><br><strong>OAEP</strong> (Optimal Asymmetric Encryption Padding) defends by modifying the plaintext before encryption using a hash function, a mask generating function (MGF), random seed, and padding. This makes the ciphertext randomized (same plaintext produces different ciphertexts each time), breaking the multiplicative property that the CCA exploits.</p></div></div>
+      </div>
+
+      <!-- L7 KEY FACTS -->
+      <div class="sec-panel" id="lec7-keyfacts">
+        <div class="lec-hero"><div class="lec-hero-num">07</div><div class="lec-hero-info"><h2>Key Facts · Lecture 7</h2></div></div>
+        <input class="fs-search" type="text" placeholder="🔍 Search facts…" oninput="filterFS(this)">
+        <div class="fs-group">
+          <div class="fs-group-lbl">Public-Key Principles</div>
+          <div class="fs-row" data-s="Diffie Hellman 1976 Stanford breakthrough"><div class="fs-name">Diffie-Hellman year</div><div class="fs-desc">Breakthrough</div><div class="fs-val" style="border-color:var(--c-blue);background:var(--c-blue-l);color:var(--c-blue)">1976, Stanford</div></div>
+          <div class="fs-row" data-s="two problems key distribution digital signatures symmetric"><div class="fs-name">Two problems solved</div><div class="fs-desc">Why public-key was invented</div><div class="fs-val" style="border-color:var(--c-cyan);background:var(--c-cyan-l);color:var(--c-cyan)">Key distribution + Digital signatures</div></div>
+          <div class="fs-row" data-s="six ingredients plaintext ciphertext public private algorithm"><div class="fs-name">PK scheme ingredients</div><div class="fs-desc">How many</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">6 ingredients</div></div>
+          <div class="fs-row" data-s="trap door one way function invertible easy infeasible"><div class="fs-name">Trap-door one-way function</div><div class="fs-desc">Key concept</div><div class="fs-val" style="border-color:var(--c-gold);background:var(--c-gold-l);color:var(--c-gold)">Easy forward, easy with k, infeasible without k</div></div>
+        </div>
+        <div class="fs-group">
+          <div class="fs-group-lbl">RSA Algorithm</div>
+          <div class="fs-row" data-s="RSA 1977 MIT Rivest Shamir Adleman"><div class="fs-name">RSA inventors/year</div><div class="fs-desc">Historical fact</div><div class="fs-val" style="border-color:var(--c-blue);background:var(--c-blue-l);color:var(--c-blue)">Rivest, Shamir, Adleman — 1977, MIT</div></div>
+          <div class="fs-row" data-s="RSA encrypt C Me mod n formula"><div class="fs-name">RSA encryption</div><div class="fs-desc">Formula</div><div class="fs-val" style="border-color:var(--c-cyan);background:var(--c-cyan-l);color:var(--c-cyan)">C = Mᵉ mod n</div></div>
+          <div class="fs-row" data-s="RSA decrypt M Cd mod n formula"><div class="fs-name">RSA decryption</div><div class="fs-desc">Formula</div><div class="fs-val" style="border-color:var(--c-cyan);background:var(--c-cyan-l);color:var(--c-cyan)">M = Cᵈ mod n</div></div>
+          <div class="fs-row" data-s="RSA public key PU e n private PR d n"><div class="fs-name">RSA key pair</div><div class="fs-desc">Components</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">PU={e,n} · PR={d,n}</div></div>
+          <div class="fs-row" data-s="e 65537 common choice two 1-bits efficient"><div class="fs-name">Common e value</div><div class="fs-desc">Most popular choice</div><div class="fs-val" style="border-color:var(--c-gold);background:var(--c-gold-l);color:var(--c-gold)">65537 (2¹⁶ + 1) — two 1-bits</div></div>
+          <div class="fs-row" data-s="CRT Chinese Remainder Theorem 4x faster decryption"><div class="fs-name">CRT speedup</div><div class="fs-desc">For decryption</div><div class="fs-val" style="border-color:var(--c-green);background:var(--c-green-l);color:var(--c-green)">~4× faster than direct computation</div></div>
+        </div>
+        <div class="fs-group">
+          <div class="fs-group-lbl">Attacks &amp; Applications</div>
+          <div class="fs-row" data-s="five attacks brute force mathematical timing fault chosen ciphertext"><div class="fs-name">RSA attack types</div><div class="fs-desc">Number of approaches</div><div class="fs-val" style="border-color:var(--c-coral);background:var(--c-coral-l);color:var(--c-coral)">5: Brute · Math · Timing · Fault · CCA</div></div>
+          <div class="fs-row" data-s="OAEP optimal asymmetric encryption padding chosen ciphertext"><div class="fs-name">OAEP</div><div class="fs-desc">Counters what attack</div><div class="fs-val" style="border-color:var(--c-violet);background:var(--c-violet-l);color:var(--c-violet)">Chosen ciphertext attack (CCA)</div></div>
+          <div class="fs-row" data-s="timing attack countermeasures constant random delay blinding"><div class="fs-name">Timing countermeasures</div><div class="fs-desc">Three approaches</div><div class="fs-val" style="border-color:var(--c-gold);background:var(--c-gold-l);color:var(--c-gold)">Constant time · Random delay · Blinding</div></div>
+          <div class="fs-row" data-s="RSA Elliptic Curve all three enc sig exchange DH DSS"><div class="fs-name">All-three algorithms</div><div class="fs-desc">Enc + Sig + Exchange</div><div class="fs-val" style="border-color:var(--c-green);background:var(--c-green-l);color:var(--c-green)">RSA + Elliptic Curve only</div></div>
+        </div>
+      </div>
+    </div><!-- /lec7 -->
 
   </div><!-- #main -->
 </div><!-- #app -->

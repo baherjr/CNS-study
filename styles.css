@@ -18,6 +18,8 @@
     body[data-lec="3"]{--accent:#ea580c;--accent-l:rgba(234,88,12,.14);--accent-m:rgba(234,88,12,.3);--accent-dk:#fb923c}
     body[data-lec="4"]{--accent:#7c3aed;--accent-l:rgba(124,58,237,.14);--accent-m:rgba(124,58,237,.3);--accent-dk:#a78bfa}
     body[data-lec="5"]{--accent:#0891b2;--accent-l:rgba(8,145,178,.14);--accent-m:rgba(8,145,178,.3);--accent-dk:#22d3ee}
+        body[data-lec="6"]{--accent:#d946ef;--accent-l:rgba(217,70,239,.14);--accent-m:rgba(217,70,239,.3);--accent-dk:#e879f9}
+        body[data-lec="7"]{--accent:#f59e0b;--accent-l:rgba(245,158,11,.14);--accent-m:rgba(245,158,11,.3);--accent-dk:#fbbf24}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth;height:100%}
     body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.65;height:100%;overflow:hidden;display:flex;flex-direction:column}
@@ -28,7 +30,7 @@
     .brand-icon{width:30px;height:30px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;transition:background .3s}
     .brand-text{font-size:13px;font-weight:600;color:rgba(255,255,255,.9);line-height:1.2}
     .brand-sub{font-size:10px;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;letter-spacing:.07em;text-transform:uppercase}
-    #lec-tabs{display:flex;align-items:center;gap:3px;padding:0 16px;height:100%;flex:1}
+    #lec-tabs{display:flex;align-items:center;gap:3px;padding:0 16px;height:100%;flex:1;overflow-x:auto}
     .lec-btn{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.4);background:none;border:none;cursor:pointer;padding:7px 13px;border-radius:var(--r);transition:color .18s,background .18s;white-space:nowrap}
     .lec-btn:hover{color:rgba(255,255,255,.75);background:rgba(255,255,255,.07)}
     .lec-btn.active{color:#fff;background:var(--accent);font-weight:600}
@@ -193,4 +195,4 @@
     .tool-out-blue{background:var(--c-blue-l);border-color:rgba(77,127,255,.25);color:var(--c-cyan)}
     .tool-out-coral{background:var(--c-coral-l);border-color:rgba(248,113,113,.25);color:var(--c-coral)}
     .tool-out-violet{background:var(--c-violet-l);border-color:rgba(167,139,250,.25);color:var(--c-violet)}
-    .tool-out-green{background:var(--c-green-l);border-color:rgba(52,211,153,.25);color:var(--c-green)}
+    .tool-out-green{background:var(--c-green-l);border-color:rgba(52,211,153,.25);color:var(--c-green)}
